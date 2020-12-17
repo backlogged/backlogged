@@ -102,8 +102,7 @@ class BacklogView(LoginRequiredMixin, ListView):
             context["now_playing"] = now_playing
 
         user_platforms = \
-            backlog.filter(user_id=user_id).values("platform_id", "platform_name") \
-                .distinct().order_by("platform_name")
+            backlog.filter(user_id=user_id).values("platform_id", "platform_name").distinct().order_by("platform_name")
         context["user_platforms"] = user_platforms
 
         return context
@@ -156,7 +155,7 @@ class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
 
 class GameInfoView(LoginRequiredMixin, FormView):
     template_name = "gameinfo.html"
-    form_class = AddGameForm
+    form_class = GameUpdateForm
 
     def get_form_kwargs(self):
         form_kwargs = super(GameInfoView, self).get_form_kwargs()

@@ -35,7 +35,7 @@ class BacklogFilterForm(forms.Form):
     sort_option = forms.CharField()
 
 
-class AddGameForm(forms.Form):
+class GameUpdateForm(forms.Form):
     # static fields
     now_playing = forms.BooleanField(required=False)
     update_mode = forms.CharField(required=False)

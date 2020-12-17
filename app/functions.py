@@ -67,7 +67,7 @@ def get_game_info_dict(game_id):
         if company.developer or company.publisher:
             game_dict["involved_companies"].add(company.company.name)
 
-    def platform_handler(platforms, single_mode=False):
+    def platform_handler(platforms):
         platform_dicts = []
 
         for platform in platforms:
@@ -89,9 +89,6 @@ def get_game_info_dict(game_id):
 
             platform_dicts.append({"platform_id": platform.id, "platform_name": platform_name})
 
-        if single_mode:
-            return platform_dicts[0]
-        else:
             return platform_dicts
 
     def format_summary(summary, truncated=False):
