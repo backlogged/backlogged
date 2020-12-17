@@ -290,21 +290,21 @@ class AdminRedirectView(LoginRequiredMixin, TemplateView):
             return render(request, template_name="adminredirect.html")
 
 
-class SoftwareLicensesView(TemplateView):
-    template_name = "licenses.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["licenses"] = json.load(open("miscellaneous/licenses.json"))
-
-        return context
-
-
 class AboutView(TemplateView):
     template_name = "about.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["version"] = get_latest_github_release()
+
+        return context
+
+
+class SoftwareLicensesView(TemplateView):
+    template_name = "licenses.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["licenses"] = json.load(open("miscellaneous/licenses.json"))
 
         return context
