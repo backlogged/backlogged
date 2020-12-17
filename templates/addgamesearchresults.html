@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_filters %}
+
+{% block title %}
+    Add Game
+{% endblock %}
+
+
+
+{% block body %}
+    <div class="container-fluid" style="color: white;padding-top: 3em;padding-left: 5em;padding-right: 5em">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Add a game</h1>
+            </div>
+            <div class="col-md-6">
+                <div class="float-right" style="margin-top: 10px">
+                    <form action="{% url 'add-game' %}" method="get">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ search_form.query }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search"
+                                         fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd"
+                                              d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"></path>
+                                        <path fill-rule="evenodd"
+                                              d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl">
+                <hr style="background-color: white">
+            </div>
+        </div>
+        <div class="row" style="display: flex;justify-content: center;align-items: center">
+            {% if game_info_dicts %}
+                {% for game in game_info_dicts %}
+                    <div class="col-auto">
+                        <a href="{% url 'game-info' game.id %}"><img
+                                alt="{{ game.name }}" class="rounded" data-placement="top" data-toggle="tooltip"
+                                height="200"
+                                src="{{ game.cover_url }}" style="margin-bottom: 10px" title="{{ game.name }}"
+                                width="150"></a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>We couldn't find any games that matched your search query. If you're sure the game you're looking for
+                    exists, check your spelling.</p>
+            {% endif %}
+        </div>
+        <div class="row" style="display: flex;justify-content: center;align-items: center">
+            <nav aria-label="Page navigation" style="padding-top: 20px">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item {% if not page > 1 %} disabled {% endif %}"><a
+                            class="page-link
+                                    {% if page > 1 %} bg-secondary text-white {% else %} bg-transparent {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'-1' }}">Previous page</a></li>
+                    <li class="page-item {% if not next_page_exists %} disabled {% endif %}"><a
+                            class="page-link {% if next_page_exists %} bg-secondary text-white {% else %} bg-transparent {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'1' }}">Next page</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_js %}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+{% endblock %}

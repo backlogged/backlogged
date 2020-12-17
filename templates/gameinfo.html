@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+
+{% block title %}
+    {{ game.name }}
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid"
+         style="display: flex;flex-direction:column;justify-content: center;align-items: center;height: 80vh;color: white">
+        <div class="row">
+            <div class="col-auto">
+                <img src="{{ game.cover_url }}" alt="" class="rounded mr-auto">
+            </div>
+            <div class="col-auto">
+                <p>
+                    <b>{{ game.name }}</b>
+                    <br>
+                    {% for company in game.involved_companies %}
+                        {% if not forloop.last %}
+                            {{ company }},
+                        {% else %}
+                            {{ company }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <hr style="background-color: white">
+                {% if game.summary %}
+                    <p>
+                        <b>Summary:</b> {{ game.summary|linebreaksbr }}{% if game.summary|endswith:"..." %}
+                        <a href="{{ game.igdb_url }}" target="_blank">Read more on IGDB</a>{% endif %}
+                    </p>
+                    <hr style="background-color: white">
+                {% endif %}
+                {% if not game_entry_exists %}
+                    <p>
+                        <b style="padding-bottom: 10px">What platform do you have this game on?</b>
+                        <br>
+                    </p>
+                    <form action="{% url 'game-info' game.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form.platform }}
+                        <button id="addButton" type="submit" class="btn btn-outline-success" name="update_mode"
+                                value="add"><span
+                                id="buttonText">Add to my backlog</span>
+                        </button>
+                        <br>
+                        {% if num_now_playing < 7 %}
+                            <p class="pt-2">{{ form.now_playing }} I'm playing this game now</p>
+                        {% else %}
+                            <div class="d-inline-block" data-placement="top" data-toggle="tooltip"
+                                 title="{{ now_playing_message }}">
+                                <p class="pt-2">{{ form.now_playing }}</p>
+                            </div>
+                            I'm playing this game now
+                        {% endif %}
+                    </form>
+                {% else %}
+                    {% if changing_platform %}
+                        <p>
+                            <b style="padding-bottom: 10px">Select a new platform:</b>
+                            <br>
+                        </p>
+                        <form action="{% url 'game-info' game.id %}" method="post">
+                            {% csrf_token %}
+                            {{ form.platform }}
+                            <button id="addButton" type="submit" class="btn btn-outline-warning" name="update_mode"
+                                    value="platform_update"><span
+                                    id="buttonText">Change platform</span>
+                            </button>
+                        </form>
+                    {% else %}
+                        <p>
+                            This game is in your {{ recorded_status }} for <b>{{ recorded_platform_name }}</b>.
+                            <br>
+                        </p>
+                        <form action="{% url 'game-info' game.id %}" method="post">
+                            {% csrf_token %}
+                            {% if recorded_status == "backlog" %}
+                                {% if num_now_playing < 7 %}
+                                    <button type="submit" name="update_mode" value="move" class="btn btn-outline-info">
+                                        Move to Now Playing
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-outline-info disabled" data-placement="top"
+                                            data-toggle="tooltip" title="{{ now_playing_message }}">
+                                        Move to Now Playing
+                                    </button>
+                                {% endif %}
+                            {% else %}
+                                <button type="submit" name="update_mode" value="move" class="btn btn-outline-success">
+                                    Move to my backlog
+                                </button>
+                            {% endif %}
+                            {% if multiple_platforms_exist %}
+                                <button type="submit" name="update_mode" value="change_platform"
+                                        class="btn btn-outline-warning">
+                                    Change platform
+                                </button>
+                            {% else %}
+                                <button class="btn btn-outline-warning disabled" data-placement="top"
+                                        data-toggle="tooltip" title="This game is only available on {{ recorded_platform_name }}.">
+                                    Change platform
+                                </button>
+                            {% endif %}
+                            <button type="submit" name="update_mode" value="remove" class="btn btn-outline-danger">
+                                Remove game
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_js %}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        function statusToggle() {
+            const checkbox = document.getElementById("npCheckbox"), button = document.getElementById("addButton"),
+                buttonText = document.getElementById("buttonText");
+
+            if (checkbox.checked === true) {
+                button.className = "btn btn-outline-info";
+                buttonText.innerText = "Add to Now Playing";
+            } else {
+                button.className = "btn btn-outline-success";
+                buttonText.innerText = "Add to my backlog";
+            }
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="https://use.typekit.net/gbt6meo.css">
+    <title>Backlogged - {% block title %}{% endblock %}</title>
+</head>
+<body style="background-color: #23272a">
+    <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+        <a href="{% url 'home' %}" class="navbar-brand">
+            <img src="{% static 'images/logo.png' %}" alt="" class="img-fluid" height="30" width="163.6142">
+        </a>
+        <ul class="navbar-nav ml-auto">
+            {% block navbar_items %}
+                {% block nav_left_of_dropdown %}
+                {% endblock %}
+                <li class="nav-item active">
+                    {% if request.user.is_authenticated %}
+                        <li class="nav-item active">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {{ request.user.username }}
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" href="{% url 'settings' %}">Account settings</a>
+                                    <a class="dropdown-item" href="{% url 'backlog' %}">Backlog</a>
+                                    {% if request.user.is_staff %}
+                                        <a href="{% url 'admin' %}" class="dropdown-item"
+                                           style="color: #ff8e29">Administration</a>
+                                    {% endif %}
+                                    <a class="dropdown-item" href="{% url 'signout' %}" style="color: #DC3545">Sign
+                                        out</a>
+                                </div>
+                            </div>
+                        </li>
+                    {% else %}
+                        <a href="{% url 'signin' %}" class="nav-link">Sign in</a>
+                    {% endif %}
+            {% endblock %}
+        </ul>
+    </nav>
+
+    {% block body %}
+    {% endblock %}
+
+    {% block footer %}
+        <footer>
+            <div class="container"
+                 style="display: flex;align-items: center;justify-content: center;padding-top: 10px;padding-bottom: 10px">
+                <span class="text-muted"><a href="{% url 'home' %}" class="text-muted">&#169; The Backlogged Project</a> -
+                    <a href="{% url 'about' %}" class="text-muted">About</a> -
+                    <a href="{% url 'licenses' %}" class="text-muted">Licenses</a>
+                </span>
+            </div>
+        </footer>
+    {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
+    {% block additional_js %}
+    {% endblock %}
+</body>
+</html>
