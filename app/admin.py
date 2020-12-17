@@ -8,7 +8,7 @@ class BackloggedGamesAdmin(admin.ModelAdmin):
 
     def get_user(self, obj):
         return obj.user.username
-    get_user.short_description = "Username"
+    get_user.short_description = "User"
     get_user.admin_order_field = "user__username"
 
 
