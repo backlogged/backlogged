@@ -1,8 +1,11 @@
 import os
 import re
+from operator import itemgetter
 
 from igdb.igdbapi_pb2 import GameResult, PlatformResult
 from igdb.wrapper import IGDBWrapper
+from github import Github
+from github.GithubException import UnknownObjectException
 
 
 def igdb_request(endpoint, query):
@@ -88,8 +91,9 @@ def get_game_info_dict(game_id):
                     platform_name = replacement
 
             platform_dicts.append({"platform_id": platform.id, "platform_name": platform_name})
+            platform_dicts.sort(key=itemgetter("platform_name"))
 
-            return platform_dicts
+        return platform_dicts
 
     def format_summary(summary, truncated=False):
         # noinspection PyTypeChecker
@@ -136,3 +140,15 @@ def get_game_info_dict(game_id):
         game_dict["summary"] = format_summary(game.summary[:200] + "...", truncated=True)
 
     return game_dict
+
+
+def get_latest_github_release():
+    github = Github(os.getenv("GITHUB_TOKEN"))
+    repo = github.get_repo("jasonalantolbert/backlogged")
+
+    try:
+        release = repo.get_latest_release()
+        return release.tag_name
+    except UnknownObjectException:
+        return ""
+

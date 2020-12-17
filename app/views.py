@@ -49,7 +49,7 @@ class BacklogView(LoginRequiredMixin, ListView):
         user_id = self.request.user.id
         search_form = BacklogSearchForm(self.request.GET)
         filter_form = BacklogFilterForm(self.request.GET)
-        default_queryset = backlog.filter(user_id=user_id, status_id=1).order_by("game_name")
+        default_queryset = backlog.filter(user_id=user_id, status_id=1)
 
         if filter_form.is_valid():
             self.is_filtering = True
@@ -98,7 +98,7 @@ class BacklogView(LoginRequiredMixin, ListView):
                 context["is_filtering"] = True
                 context["filter_mode"] = self.filter_mode
         else:
-            now_playing = backlog.filter(user_id=user_id, status_id=2).order_by("game_name")
+            now_playing = backlog.filter(user_id=user_id, status_id=2)
             context["now_playing"] = now_playing
 
         user_platforms = \
@@ -158,7 +158,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
     form_class = GameUpdateForm
 
     def get_form_kwargs(self):
-        form_kwargs = super(GameInfoView, self).get_form_kwargs()
+        form_kwargs = super().get_form_kwargs()
 
         self.kwargs.update({
             "game_dict": get_game_info_dict(self.kwargs.get("game_id"))
@@ -295,11 +295,16 @@ class SoftwareLicensesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        with open("miscellaneous/licenses.json") as licenses:
-            context["licenses"] = json.load(licenses)
+        context["licenses"] = json.load(open("miscellaneous/licenses.json"))
 
         return context
 
 
 class AboutView(TemplateView):
     template_name = "about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["version"] = get_latest_github_release()
+
+        return context
