@@ -62,11 +62,21 @@
                 <ul class="pagination pagination-lg">
                     <li class="page-item {% if not page > 1 %} disabled {% endif %}"><a
                             class="page-link
-                                    {% if page > 1 %} bg-secondary text-white {% else %} bg-transparent {% endif %}"
-                            href="{% url 'add-game' %}page={{ page|add:'-1' }}">Previous page</a></li>
+                                    {% if not page > 1 %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'-1' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-caret-left-fill" viewBox="0 0 16 16">
+                            <path d="M3.86 8.753l5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z"></path>
+                        </svg>
+                        Previous</a></li>
                     <li class="page-item {% if not next_page_exists %} disabled {% endif %}"><a
-                            class="page-link {% if next_page_exists %} bg-secondary text-white {% else %} bg-transparent {% endif %}"
-                            href="{% url 'add-game' %}page={{ page|add:'1' }}">Next page</a></li>
+                            class="page-link {% if not next_page_exists %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'1' }}">Next
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                            <path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"></path>
+                        </svg>
+                    </a></li>
                 </ul>
             </nav>
         </div>

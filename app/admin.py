@@ -12,4 +12,4 @@ class BackloggedGamesAdmin(admin.ModelAdmin):
     get_user.admin_order_field = "user__username"
 
 
-admin.site.register(BackloggedGamesModel, BackloggedGamesAdmin)
+admin.site.register(BackloggedGameModel, BackloggedGamesAdmin)

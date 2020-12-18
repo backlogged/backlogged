@@ -29,7 +29,7 @@
                 <hr style="background-color: white">
                 {% if game.summary %}
                     <p>
-                        <b>Summary:</b> {{ game.summary|linebreaksbr }}{% if game.summary|endswith:"..." %}
+                        <b>Summary:</b> {{ game.summary|linebreaksbr }}{% if game.summary|endswith:'...' %}
                         <a href="{{ game.igdb_url }}" target="_blank">Read more on IGDB</a>{% endif %}
                     </p>
                     <hr style="background-color: white">

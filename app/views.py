@@ -11,7 +11,7 @@ from app.forms import *
 from app.functions import *
 from app.models import *
 
-backlog = BackloggedGamesModel.objects
+backlog = BackloggedGameModel.objects
 
 
 class HomePageView(TemplateView):
@@ -36,42 +36,43 @@ class SignInView(LoginView):
 class BacklogView(LoginRequiredMixin, ListView):
     login_url = "/login"
     template_name = "backlog.html"
-    paginate_by = 50
+    paginate_by = 21
 
     def __init__(self):
         super().__init__()
         self.is_searching = False
-        self.search_query = None
         self.is_filtering = False
+        self.search_query = None
         self.filter_mode = None
 
     def get_queryset(self):
         user_id = self.request.user.id
         search_form = BacklogSearchForm(self.request.GET)
         filter_form = BacklogFilterForm(self.request.GET)
-        default_queryset = backlog.filter(user_id=user_id, status_id=1)
+        queryset = backlog.filter(user_id=user_id).order_by("-status_id")
 
         if filter_form.is_valid():
+            self.filter_mode = self.request.GET
             self.is_filtering = True
             filter_data = filter_form.cleaned_data
             sort_option = filter_data["sort_option"]
-            default_queryset = backlog.filter(user_id=user_id).order_by("game_name")
+            queryset = backlog.filter(user_id=user_id).order_by("game_name")
 
             if sort_option == "alphabetic":
                 self.filter_mode = "A-Z"
             elif sort_option.startswith("date"):
                 if sort_option == "date_oldest":
                     self.filter_mode = "Date Added (Oldest)"
-                    default_queryset = default_queryset.order_by("-date_added")
+                    queryset = queryset.order_by("date_added")
                 elif sort_option == "date_newest":
                     self.filter_mode = "Date Added (Newest)"
-                    default_queryset = default_queryset.order_by("date_added")
+                    queryset = queryset.order_by("-date_added")
             else:
                 filter_platform_id = int(filter_data["sort_option"])
                 filter_platform_name = \
                     backlog.filter(platform_id=filter_platform_id).values_list("platform_name", flat=True).distinct()
                 self.filter_mode = filter_platform_name[0]
-                default_queryset = default_queryset.filter(platform_id=filter_platform_id)
+                queryset = queryset.filter(platform_id=filter_platform_id)
 
         if search_form.is_valid():
             self.search_query = self.request.GET
@@ -79,31 +80,61 @@ class BacklogView(LoginRequiredMixin, ListView):
             search_data = search_form.cleaned_data
             if search_data["query"]:
                 search_query = "\W*".join(search_data["query"])
-                default_queryset = backlog.filter(user_id=user_id, game_name__iregex=search_query).order_by("game_name")
+                queryset = backlog.filter(user_id=user_id, game_name__iregex=search_query).order_by("game_name")
 
-        return default_queryset
+        return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["current_date"] = datetime.today().date()
-        context["search_form"] = BacklogSearchForm()
-        context["filter_form"] = BacklogFilterForm()
-        user_id = self.request.user.id
-        if self.is_searching or self.is_filtering:
-            if self.is_searching:
-                context["is_searching"] = True
-                search_form = BacklogSearchForm(self.search_query)
-                context["search_form"] = search_form
-            if self.is_filtering:
-                context["is_filtering"] = True
-                context["filter_mode"] = self.filter_mode
-        else:
-            now_playing = backlog.filter(user_id=user_id, status_id=2)
-            context["now_playing"] = now_playing
+        context.update({
+            "current_date": datetime.today().date(),
+            "search_form": BacklogSearchForm(self.search_query),
+            "filter_form": BacklogFilterForm(self.filter_mode),
+        })
 
-        user_platforms = \
-            backlog.filter(user_id=user_id).values("platform_id", "platform_name").distinct().order_by("platform_name")
-        context["user_platforms"] = user_platforms
+        user_id = self.request.user.id
+
+        page_obj = context["page_obj"]
+        last_page = page_obj.paginator.num_pages
+        page_range = pagination_helper(page_obj.number, last_page)
+
+        context.update({
+            "page_range": page_range,
+            "last_page": last_page
+        })
+
+        if self.is_searching:
+            search_form = BacklogSearchForm(self.search_query)
+            context.update({
+                "is_searching": True,
+                "search_form": search_form,
+            })
+
+        if self.is_filtering:
+            context.update({
+                "is_filtering": True,
+                "filter_mode": self.filter_mode,
+            })
+
+        user_platforms = backlog.filter(user_id=user_id).values(
+            "platform_id", "platform_name").distinct().order_by("platform_name")
+
+        num_now_playing = backlog.filter(user_id=user_id, status_id=2).count()
+
+        if page_obj.number == 1 and not (self.is_searching or self.is_filtering):
+            game_slice = f"0:{num_now_playing}"
+            remaining_slice = f"{num_now_playing}:"
+            context["remaining_slice"] = remaining_slice
+        else:
+            game_slice = ":"
+
+        url_parameters = request_constructor(self.request.GET)
+
+        context.update({
+            "user_platforms": user_platforms,
+            "game_slice": game_slice,
+            "url_parameters": url_parameters
+        })
 
         return context
 
@@ -184,7 +215,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
 
         try:
             existing_game_entry = backlog.get(game_id=game_dict["id"], user_id=self.request.user.id)
-        except BackloggedGamesModel.DoesNotExist:
+        except BackloggedGameModel.DoesNotExist:
             pass
         else:
             recorded_platform_id, recorded_status = existing_game_entry.platform_id, existing_game_entry.status_name
@@ -213,7 +244,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
         if update_mode == "add":
             try:
                 backlog.get(game_id=game_id, user_id=user_id)
-            except BackloggedGamesModel.DoesNotExist:
+            except BackloggedGameModel.DoesNotExist:
                 status_name = "Now Playing" if form_data["now_playing"] else "backlog"
                 status_id = 2 if status_name == "Now Playing" else 1
                 platform_id, platform_name = form_data["platform"].split(sep=",")

@@ -2,21 +2,16 @@ import os
 import re
 from operator import itemgetter
 
-from igdb.igdbapi_pb2 import GameResult, PlatformResult
-from igdb.wrapper import IGDBWrapper
 from github import Github
 from github.GithubException import UnknownObjectException
+from igdb.igdbapi_pb2 import GameResult
+from igdb.wrapper import IGDBWrapper
 
 
-def igdb_request(endpoint, query):
-    result_types = {
-        "games": GameResult(),
-        "platforms": PlatformResult()
-    }
-
+def igdb_request(query):
     wrapper = IGDBWrapper(client_id=os.getenv("IGDB_CLIENT_ID"), auth_token=os.getenv("IGDB_AUTH_TOKEN"))
-    results = result_types[endpoint]
-    response = wrapper.api_request(endpoint=f'{endpoint}.pb', query=query)
+    results = GameResult()
+    response = wrapper.api_request(endpoint='games.pb', query=query)
 
     results.ParseFromString(response)
     return results
@@ -25,8 +20,7 @@ def igdb_request(endpoint, query):
 def get_search_view_dicts(search, offset=0):
     game_info_dicts = []
 
-    results = igdb_request(endpoint='games',
-                           query=f'search "{search}";'
+    results = igdb_request(query=f'search "{search}";'
                                  f'fields name, cover.url, platforms;'
                                  f'where category = 0;'
                                  f'offset {offset};'
@@ -47,7 +41,6 @@ def get_search_view_dicts(search, offset=0):
 
 def get_game_info_dict(game_id):
     results = igdb_request(
-        endpoint='games',
         query=f'fields name, url, cover.url, summary, platforms.name,'
               f'involved_companies.company.name, involved_companies.developer,'
               f'involved_companies.publisher;'
@@ -152,3 +145,25 @@ def get_latest_github_release():
     except UnknownObjectException:
         return ""
 
+
+def pagination_helper(page, last_page):
+    if last_page > 5:
+        if page > 3:
+            end = min(page + 2, last_page)
+            start = page - 2 if end != last_page else last_page - 4
+            page_range = range(start, end + 1)
+        else:
+            page_range = range(1, 6)
+    else:
+        page_range = range(1, last_page + 1)
+
+    return page_range
+
+
+def request_constructor(querydict):
+    request = "?"
+    for key, value in querydict.items():
+        if key != "page":
+            request += f"{key}={value}&"
+
+    return request

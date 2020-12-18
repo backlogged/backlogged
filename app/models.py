@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class BackloggedGamesModel(models.Model):
+class BackloggedGameModel(models.Model):
     entry_id = models.AutoField(primary_key=True)
     game_id = models.IntegerField()
     game_name = models.CharField(max_length=1024, default="")
