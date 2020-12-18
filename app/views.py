@@ -11,7 +11,7 @@ from app.forms import *
 from app.functions import *
 from app.models import *
 
-backlog = BackloggedGameModel.objects
+backlog = BackloggedGamesModel.objects
 
 
 class HomePageView(TemplateView):
@@ -215,7 +215,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
 
         try:
             existing_game_entry = backlog.get(game_id=game_dict["id"], user_id=self.request.user.id)
-        except BackloggedGameModel.DoesNotExist:
+        except BackloggedGamesModel.DoesNotExist:
             pass
         else:
             recorded_platform_id, recorded_status = existing_game_entry.platform_id, existing_game_entry.status_name
@@ -244,7 +244,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
         if update_mode == "add":
             try:
                 backlog.get(game_id=game_id, user_id=user_id)
-            except BackloggedGameModel.DoesNotExist:
+            except BackloggedGamesModel.DoesNotExist:
                 status_name = "Now Playing" if form_data["now_playing"] else "backlog"
                 status_id = 2 if status_name == "Now Playing" else 1
                 platform_id, platform_name = form_data["platform"].split(sep=",")
