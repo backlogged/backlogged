@@ -10,11 +10,12 @@ from django.views.generic import CreateView, UpdateView, DeleteView, FormView, T
 from app.forms import *
 from app.functions import *
 from app.models import *
+from app.mixins import HerokuRedirectMixin
 
 backlog = BackloggedGamesModel.objects
 
 
-class HomePageView(TemplateView):
+class HomePageView(HerokuRedirectMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect("backlog")
@@ -22,18 +23,18 @@ class HomePageView(TemplateView):
             return render(request, template_name="home.html")
 
 
-class SignUpView(CreateView):
+class SignUpView(HerokuRedirectMixin, CreateView):
     form_class = UserCreationForm
     success_url = "/login"
     template_name = "signup.html"
 
 
-class SignInView(LoginView):
+class SignInView(HerokuRedirectMixin, LoginView):
     redirect_authenticated_user = True
     template_name = "login.html"
 
 
-class BacklogView(LoginRequiredMixin, ListView):
+class BacklogView(HerokuRedirectMixin, LoginRequiredMixin, ListView):
     login_url = "/login"
     template_name = "backlog.html"
     paginate_by = 21
@@ -139,7 +140,7 @@ class BacklogView(LoginRequiredMixin, ListView):
         return context
 
 
-class AddGameSearchView(LoginRequiredMixin, FormView):
+class AddGameSearchView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
     template_name = "addgamesearch.html"
     form_class = GameSearchForm
 
@@ -153,7 +154,7 @@ class AddGameSearchView(LoginRequiredMixin, FormView):
         return context
 
 
-class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
+class AddGameSearchResultsView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         search_form = GameSearchForm(self.request.GET)
@@ -184,7 +185,7 @@ class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
         return render(request, template_name="addgamesearchresults.html", context=context)
 
 
-class GameInfoView(LoginRequiredMixin, FormView):
+class GameInfoView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
     template_name = "gameinfo.html"
     form_class = GameUpdateForm
 
@@ -282,11 +283,11 @@ class GameInfoView(LoginRequiredMixin, FormView):
         return redirect("backlog")
 
 
-class AccountSettingsView(LoginRequiredMixin, TemplateView):
+class AccountSettingsView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
     template_name = "accountsettings.html"
 
 
-class ChangeUsernameView(LoginRequiredMixin, UpdateView):
+class ChangeUsernameView(HerokuRedirectMixin, LoginRequiredMixin, UpdateView):
     model = User
     fields = ["username"]
     success_url = "/settings"
@@ -296,16 +297,16 @@ class ChangeUsernameView(LoginRequiredMixin, UpdateView):
         return User.objects.get(username=self.request.user.username)
 
 
-class ChangeUserPasswordView(PasswordChangeView):
+class ChangeUserPasswordView(HerokuRedirectMixin, PasswordChangeView):
     template_name = "changepassword.html"
     success_url = "/settings"
 
 
-class DeleteAccountPromptView(LoginRequiredMixin, TemplateView):
+class DeleteAccountPromptView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
     template_name = "deleteaccount.html"
 
 
-class AccountDeletionView(LoginRequiredMixin, DeleteView):
+class AccountDeletionView(HerokuRedirectMixin, LoginRequiredMixin, DeleteView):
     model = User
     success_url = "/"
 
@@ -313,7 +314,7 @@ class AccountDeletionView(LoginRequiredMixin, DeleteView):
         return self.request.user
 
 
-class AdminRedirectView(LoginRequiredMixin, TemplateView):
+class AdminRedirectView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if self.request.user.is_staff:
             return redirect(f"/{os.getenv('ADMIN_URL')}")
@@ -321,7 +322,7 @@ class AdminRedirectView(LoginRequiredMixin, TemplateView):
             return render(request, template_name="adminredirect.html")
 
 
-class AboutView(TemplateView):
+class AboutView(HerokuRedirectMixin, TemplateView):
     template_name = "about.html"
 
     def get_context_data(self, **kwargs):
@@ -331,7 +332,7 @@ class AboutView(TemplateView):
         return context
 
 
-class SoftwareLicensesView(TemplateView):
+class SoftwareLicensesView(HerokuRedirectMixin, TemplateView):
     template_name = "licenses.html"
 
     def get_context_data(self, **kwargs):
