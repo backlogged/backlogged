@@ -15,12 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth.views import LogoutView
-from django.urls import path, re_path
-from strgen import StringGenerator as strgen
+from django.urls import path
 
 from app.views import *
-
-os.environ["ADMIN_URL"] = strgen("[\w\d]{20}").render()
 
 urlpatterns = [
     path(f'{os.getenv("ADMIN_URL")}/', admin.site.urls),
@@ -30,7 +27,6 @@ urlpatterns = [
     path('login/', SignInView.as_view(), name='signin'),
     path('logout/', LogoutView.as_view(), name='signout'),
     path('backlog/', BacklogView.as_view(), name='backlog'),
-    # path('backlog/search/', BacklogView.as_view(), name='backlog-search'),
     path('backlog/games/add-game/', AddGameSearchResultsView.as_view(), name='add-game'),
     path('backlog/games/add-game/page=<int:page>/', AddGameSearchResultsView.as_view()),
     path('backlog/games/id=<int:game_id>/', GameInfoView.as_view(), name='game-info'),

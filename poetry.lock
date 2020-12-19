@@ -227,14 +227,6 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
-name = "stringgenerator"
-version = "0.3.4"
-description = "Generate randomized strings of characters using a template"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "urllib3"
 version = "1.25.11"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -269,7 +261,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.0"
-content-hash = "923c4a95269a3eb7d4c71176e427b2eaa6271cffd88e73e8dbe251f4d703a583"
+content-hash = "307b3fb371438459686321d702aa08c09bc63be2350b168783c00b4c5421220b"
 
 [metadata.files]
 asgiref = [
@@ -383,9 +375,6 @@ six = [
 sqlparse = [
     {file = "sqlparse-0.4.1-py3-none-any.whl", hash = "sha256:017cde379adbd6a1f15a61873f43e8274179378e95ef3fede90b5aa64d304ed0"},
     {file = "sqlparse-0.4.1.tar.gz", hash = "sha256:0f91fd2e829c44362cbcfab3e9ae12e22badaa8a29ad5ff599f9ec109f0454e8"},
-]
-stringgenerator = [
-    {file = "StringGenerator-0.3.4.tar.gz", hash = "sha256:c8274ac021c08cd71a504e86937e6be9a17e38af149a906848ea8ce23b089790"},
 ]
 urllib3 = [
     {file = "urllib3-1.25.11-py2.py3-none-any.whl", hash = "sha256:f5321fbe4bf3fefa0efd0bfe7fb14e90909eb62a48ccda331726b4319897dd5e"},
