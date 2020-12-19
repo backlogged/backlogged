@@ -9,8 +9,8 @@ from django.views.generic import CreateView, UpdateView, DeleteView, FormView, T
 
 from app.forms import *
 from app.functions import *
-from app.models import *
 from app.mixins import HerokuRedirectMixin
+from app.models import *
 
 backlog = BackloggedGamesModel.objects
 
