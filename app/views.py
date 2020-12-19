@@ -16,8 +16,6 @@ backlog = BackloggedGamesModel.objects
 
 class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
-        # if "herokuapp" in self.request.build_absolute_uri():
-        #     return redirect("https://www.backlogged.games")
         if request.user.is_authenticated:
             return redirect("backlog")
         else:
