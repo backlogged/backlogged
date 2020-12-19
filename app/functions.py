@@ -137,7 +137,7 @@ def get_game_info_dict(game_id):
 
 def get_latest_github_release():
     github = Github(os.getenv("GITHUB_TOKEN"))
-    repo = github.get_repo("jasonalantolbert/backlogged")
+    repo = github.get_repo(os.getenv("GITHUB_REPO"))
 
     try:
         release = repo.get_latest_release()
