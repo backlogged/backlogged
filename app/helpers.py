@@ -93,24 +93,34 @@ def get_game_info_dict(game_id: int):
         """
         platform_dicts = []
 
-        for platform in platforms:
-            platform_replacements = {
-                # Replacing name: name to replace
-                "Microsoft Windows (PC)": ["PC (Microsoft Windows)"],
-                "macOS": ["Mac"],
-                "Xbox Series X|S": ["Xbox Series"],
-                "Stadia": ["Google Stadia"],
-                "NES": ["Nintendo Entertainment System (NES)"],
-                "SNES": ["Super Nintendo Entertainment System (SNES)"],
-                "Famicom": ["Family Computer Disk System"]
-            }
+        platform_name_replacements = {
+            # Replacing name: name to replace
+            "Microsoft Windows (PC)": ["PC (Microsoft Windows)"],
+            "macOS": ["Mac"],
+            "Xbox Series X|S": ["Xbox Series"],
+            "Stadia": ["Google Stadia"],
+            "NES": ["Nintendo Entertainment System (NES)"],
+            "SNES": ["Super Nintendo Entertainment System (SNES)"],
+            "Famicom": ["Family Computer Disk System", "Family Computer (FAMICOM)"]
+        }
 
+        platform_id_replacements = {
+            "170": "203",  # Google Stadia
+            "99": "51",  # Famicom
+        }
+
+        for platform in platforms:
             platform_name = platform.name
-            for replacement, flags in platform_replacements.items():
+            for replacement, flags in platform_name_replacements.items():
                 if platform_name in flags:
                     platform_name = replacement
 
-            platform_dicts.append({"platform_id": platform.id, "platform_name": platform_name})
+            platform_id = platform.id
+            for replacement, flag in platform_id_replacements.items():
+                if platform_id == int(flag):
+                    platform_id = int(replacement)
+
+            platform_dicts.append({"platform_id": platform_id, "platform_name": platform_name})
             platform_dicts.sort(key=itemgetter("platform_name"))
 
         return platform_dicts
