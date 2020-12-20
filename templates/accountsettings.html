@@ -14,15 +14,15 @@
             <div class="d-flex flex-row" style="display: flex;justify-content: center;padding-top: 10px">
                 <a href="{% url 'change-username' %}" class="btn btn-secondary">Change username</a>
             </div>
-            <div class="d-flex d-flex-row" style="display:flex;justify-content: center;padding-top: 10px">
+            <div class="d-flex flex-row" style="display:flex;justify-content: center;padding-top: 10px">
                 <a href="{% url 'change-password' %}" class="btn btn-secondary">Change password</a>
+            </div>
+            <div class="d-flex flex-row" style="display:flex;justify-content: center;padding-top: 10px">
+                <a href="{% url 'change-time-zone' %}" class="btn btn-secondary">Change time zone</a>
             </div>
             <div class="d-flex flex-row" style="display: flex;justify-content: center;padding-top: 10px">
                 <a href="{% url 'delete-account-prompt' %}" class="btn btn-danger">Delete account</a>
             </div>
         </div>
     </div>
-{#    <footer>#}
-{#        <a href="{% url 'licenses' %}" class="float-right" style="color: #797878;padding-right: 10px">Third-party software</a>#}
-{#    </footer>#}
 {% endblock %}

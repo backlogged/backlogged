@@ -1,3 +1,4 @@
+import pytz
 from crispy_forms.helper import FormHelper
 from django import forms
 
@@ -56,7 +57,7 @@ class GameUpdateForm(forms.Form):
             platform_str = f"{platform['platform_id']},{platform['platform_name']}"
             self.platform_list.append((platform_str, platform["platform_name"]))
 
-        self.fields["platform"] = forms.CharField(widget=forms.Select(choices=self.platform_list), required=False)
+        self.fields["platform"] = forms.ChoiceField(choices=self.platform_list, required=False)
 
         # html attribute assignments
         self.fields["platform"].widget.attrs["class"] = "select btn btn-secondary"
@@ -65,3 +66,15 @@ class GameUpdateForm(forms.Form):
         if self.num_now_playing >= 7:
             self.fields["now_playing"].widget.attrs["disabled"] = ""
             self.fields["now_playing"].widget.attrs["style"] = "pointer-events: none;"
+
+
+class TimezoneUpdateForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # timezone field initialization
+        self.timezone_list = []
+        for tz in pytz.all_timezones:
+            self.timezone_list.append((tz, tz.replace("_", " ")))
+
+        self.fields["timezone"] = forms.ChoiceField(label="Time zone", choices=self.timezone_list)

@@ -34,6 +34,7 @@ urlpatterns = [
     path('settings/', AccountSettingsView.as_view(), name='settings'),
     path('settings/change-username/', ChangeUsernameView.as_view(), name='change-username'),
     path('settings/change-password/', ChangeUserPasswordView.as_view(), name='change-password'),
+    path('settings/change-time-zone', ChangeTimezoneView.as_view(), name='change-time-zone'),
     path('settings/delete-account/', DeleteAccountPromptView.as_view(), name='delete-account-prompt'),
     path('settings/delete-account/no-like-actually-delete-my-account', AccountDeletionView.as_view(),
          name='delete-account-real'),

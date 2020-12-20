@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 
 from django.contrib.auth.forms import UserCreationForm
@@ -7,15 +8,15 @@ from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.shortcuts import redirect, render
 from django.views.generic import CreateView, UpdateView, DeleteView, FormView, TemplateView, ListView
 
+import app.helpers as helpers
 from app.forms import *
-from app.functions import *
-from app.mixins import HerokuRedirectMixin
 from app.models import *
 
 backlog = BackloggedGamesModel.objects
+timezones = UserTimezoneModel.objects
 
 
-class HomePageView(HerokuRedirectMixin, TemplateView):
+class HomePageView(TemplateView):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect("backlog")
@@ -23,18 +24,18 @@ class HomePageView(HerokuRedirectMixin, TemplateView):
             return render(request, template_name="home.html")
 
 
-class SignUpView(HerokuRedirectMixin, CreateView):
+class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = "/login"
     template_name = "signup.html"
 
 
-class SignInView(HerokuRedirectMixin, LoginView):
+class SignInView(LoginView):
     redirect_authenticated_user = True
     template_name = "login.html"
 
 
-class BacklogView(HerokuRedirectMixin, LoginRequiredMixin, ListView):
+class BacklogView(LoginRequiredMixin, ListView):
     login_url = "/login"
     template_name = "backlog.html"
     paginate_by = 21
@@ -88,16 +89,24 @@ class BacklogView(HerokuRedirectMixin, LoginRequiredMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update({
-            "current_date": datetime.today().date(),
             "search_form": BacklogSearchForm(self.search_query),
             "filter_form": BacklogFilterForm(self.filter_mode),
         })
 
         user_id = self.request.user.id
 
+        try:
+            timezones.get(user_id=user_id)
+        except UserTimezoneModel.DoesNotExist:
+            current_date = helpers.get_local_date(self.request, use_api=True)
+        else:
+            current_date = helpers.get_local_date(self.request, use_api=False)
+
+        context["current_date"] = current_date
+
         page_obj = context["page_obj"]
         last_page = page_obj.paginator.num_pages
-        page_range = pagination_helper(page_obj.number, last_page)
+        page_range = helpers.pagination_helper(page_obj.number, last_page)
 
         context.update({
             "page_range": page_range,
@@ -129,7 +138,7 @@ class BacklogView(HerokuRedirectMixin, LoginRequiredMixin, ListView):
         else:
             game_slice = ":"
 
-        url_parameters = request_constructor(self.request.GET)
+        url_parameters = helpers.request_constructor(self.request.GET)
 
         context.update({
             "user_platforms": user_platforms,
@@ -140,7 +149,7 @@ class BacklogView(HerokuRedirectMixin, LoginRequiredMixin, ListView):
         return context
 
 
-class AddGameSearchView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
+class AddGameSearchView(LoginRequiredMixin, FormView):
     template_name = "addgamesearch.html"
     form_class = GameSearchForm
 
@@ -154,7 +163,7 @@ class AddGameSearchView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
         return context
 
 
-class AddGameSearchResultsView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
+class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         search_form = GameSearchForm(self.request.GET)
@@ -169,11 +178,11 @@ class AddGameSearchResultsView(HerokuRedirectMixin, LoginRequiredMixin, Template
         search_data = search_form.cleaned_data
         page = kwargs.get("page", 1)
         offset = (page - 1) * 50
-        game_info_dicts = get_search_view_dicts(search_data["query"], offset=offset)
+        game_info_dicts = helpers.get_search_view_dicts(search_data["query"], offset=offset)
         if len(game_info_dicts) == 1 and offset == 0:
             game = game_info_dicts[0]
             return redirect('game-info', game_id=game["id"])
-        next_page_exists = bool(get_search_view_dicts(search_data["query"], offset=offset + 50))
+        next_page_exists = bool(helpers.get_search_view_dicts(search_data["query"], offset=offset + 50))
 
         context = {
             "game_info_dicts": game_info_dicts,
@@ -185,7 +194,7 @@ class AddGameSearchResultsView(HerokuRedirectMixin, LoginRequiredMixin, Template
         return render(request, template_name="addgamesearchresults.html", context=context)
 
 
-class GameInfoView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
+class GameInfoView(LoginRequiredMixin, FormView):
     template_name = "gameinfo.html"
     form_class = GameUpdateForm
 
@@ -193,7 +202,7 @@ class GameInfoView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
         form_kwargs = super().get_form_kwargs()
 
         self.kwargs.update({
-            "game_dict": get_game_info_dict(self.kwargs.get("game_id"))
+            "game_dict": helpers.get_game_info_dict(self.kwargs.get("game_id"))
         })
 
         form_kwargs.update({
@@ -283,30 +292,50 @@ class GameInfoView(HerokuRedirectMixin, LoginRequiredMixin, FormView):
         return redirect("backlog")
 
 
-class AccountSettingsView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
+class AccountSettingsView(LoginRequiredMixin, TemplateView):
     template_name = "accountsettings.html"
 
 
-class ChangeUsernameView(HerokuRedirectMixin, LoginRequiredMixin, UpdateView):
+class ChangeUsernameView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ["username"]
     success_url = "/settings"
     template_name = "changeusername.html"
 
     def get_object(self, queryset=None):
-        return User.objects.get(username=self.request.user.username)
+        return User.objects.get(id=self.request.user.id)
 
 
-class ChangeUserPasswordView(HerokuRedirectMixin, PasswordChangeView):
+class ChangeUserPasswordView(PasswordChangeView):
     template_name = "changepassword.html"
     success_url = "/settings"
 
 
-class DeleteAccountPromptView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
+class ChangeTimezoneView(FormView):
+    success_url = "/settings"
+    template_name = "changetimezone.html"
+    form_class = TimezoneUpdateForm
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["timezone"] = timezones.filter(user_id=self.request.user.id).values_list("timezone", flat=True)[0]
+
+        return initial
+
+    def form_valid(self, form):
+        form_data = form.cleaned_data
+        existing_timezone_entry = timezones.get(user_id=self.request.user.id)
+        existing_timezone_entry.timezone = form_data["timezone"]
+        existing_timezone_entry.save()
+
+        return redirect("settings")
+
+
+class DeleteAccountPromptView(LoginRequiredMixin, TemplateView):
     template_name = "deleteaccount.html"
 
 
-class AccountDeletionView(HerokuRedirectMixin, LoginRequiredMixin, DeleteView):
+class AccountDeletionView(LoginRequiredMixin, DeleteView):
     model = User
     success_url = "/"
 
@@ -314,7 +343,7 @@ class AccountDeletionView(HerokuRedirectMixin, LoginRequiredMixin, DeleteView):
         return self.request.user
 
 
-class AdminRedirectView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
+class AdminRedirectView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if self.request.user.is_staff:
             return redirect(f"/{os.getenv('ADMIN_URL')}")
@@ -322,17 +351,17 @@ class AdminRedirectView(HerokuRedirectMixin, LoginRequiredMixin, TemplateView):
             return render(request, template_name="adminredirect.html")
 
 
-class AboutView(HerokuRedirectMixin, TemplateView):
+class AboutView(TemplateView):
     template_name = "about.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["version"] = get_latest_github_release()
+        context["version"] = helpers.get_latest_github_release()
 
         return context
 
 
-class SoftwareLicensesView(HerokuRedirectMixin, TemplateView):
+class SoftwareLicensesView(TemplateView):
     template_name = "licenses.html"
 
     def get_context_data(self, **kwargs):

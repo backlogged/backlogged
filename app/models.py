@@ -13,3 +13,8 @@ class BackloggedGamesModel(models.Model):
     status_name = models.CharField(max_length=1024)
     date_added = models.DateField(default="1970-01-01")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class UserTimezoneModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timezone = models.CharField(max_length=1024)
