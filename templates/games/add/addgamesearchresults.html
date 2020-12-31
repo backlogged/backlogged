@@ -1,0 +1,98 @@
+{% extends 'base/base.html' %}
+{% load static crispy_forms_filters %}
+
+{% block title %}
+    Add Game
+{% endblock %}
+
+
+
+{% block body %}
+    <div class="container-fluid" style="color: white;padding-top: 3em;padding-left: 5em;padding-right: 5em">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Add a game</h1>
+            </div>
+            <div class="col-md-6">
+                <div class="float-right" style="margin-top: 10px">
+                    <form action="{% url 'add-game' %}" method="get">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ search_form.query }}
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-success" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl">
+                <hr style="background-color: white">
+            </div>
+        </div>
+        <div class="row" style="display: flex;justify-content: center;align-items: center">
+            {% if game_info_dicts %}
+                {% for game in game_info_dicts %}
+                    <div class="col-auto">
+                        <a href="{% url 'game-info' game.id %}">
+                            <img alt="{{ game.name }}" data-placement="top" data-toggle="tooltip"
+                                 height="200"
+                                 src="{{ game.cover_url }}" style="margin-bottom: 10px;border-width: 3px !important;"
+                                 title="{{ game.name }}"
+                                 width="150"
+                                 class="rounded
+                                {% if game.status_id == 1 %}
+                                    border border-success
+                                {% elif game.status_id == 2 %}
+                                    border border-info
+                                {% endif %}">
+                            {% if game.status_id == 1 %}
+                                <span class="badge-caption-lower badge badge-pill badge-success">Backlog</span>
+                            {% elif game.status_id == 2 %}
+                                <span class="badge-caption-lower badge badge-pill badge-info">Now Playing</span>
+                            {% endif %}
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>We couldn't find any games that matched your search query. If you're sure the game you're looking for
+                    exists, check your spelling.</p>
+            {% endif %}
+        </div>
+        <div class="row" style="display: flex;justify-content: center;align-items: center">
+            <nav aria-label="Page navigation" style="padding-top: 20px">
+                <ul class="pagination pagination-lg">
+
+                    {# Previous page #}
+                    <li class="page-item {% if not page > 1 %} disabled {% endif %}"><a
+                            class="page-link
+                                    {% if not page > 1 %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'-1' }}">
+                        <i class="bi bi-caret-left-fill"></i>
+                        Previous</a>
+                    </li>
+
+                    {# Next page #}
+                    <li class="page-item {% if not next_page_exists %} disabled {% endif %}"><a
+                            class="page-link {% if not next_page_exists %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                            href="{% url 'add-game' %}page={{ page|add:'1' }}">Next
+                        <i class="bi bi-caret-right-fill"></i></a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_js %}
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+{% endblock %}

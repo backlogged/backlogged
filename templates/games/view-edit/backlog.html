@@ -1,0 +1,257 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{ request.user.username }}'s Backlog
+{% endblock %}
+
+{% block nav_left_of_dropdown %}
+    <li class="nav-item active" style="padding-right: 10px">
+        <a href="{% url 'backlog' %}" class="btn btn-outline-light" {% if not is_searching and not is_filtering %}
+           style="visibility: hidden" {% endif %}>
+            {% if is_searching %}
+                Clear search
+            {% endif %}
+            {% if is_filtering %}
+                Reset sort
+            {% endif %}
+        </a>
+    </li>
+    {% if object_list or now_playing or is_searching or is_filtering %}
+        <li class="nav-item active" style="padding-right: 10px">
+            <a href="{% url 'add-game-search' %}" class="btn btn-outline-success">Add a game</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    {% if object_list or now_playing or is_searching or is_filtering %}
+        <div class="container-fluid" style="color: white;padding-top: 3em;padding-left: 5em;padding-right: 5em;">
+            <div class="row">
+                <div class="col-xl my-auto">
+                    <h5>Welcome, <b>{{ request.user.username }}</b></h5>
+                </div>
+                <div class="col-lg-2 my-auto">
+                    <div class="" style="display: flex;flex-flow: row wrap;justify-content: center;align-items: center">
+                        <h5 data-placement="top" data-toggle="tooltip"
+                            title="If this date is not correct, please change your time zone in your account settings.">
+                            {{ current_date }}
+                        </h5>
+                    </div>
+                </div>
+                <div class="col-xl-5">
+                    <div class="float-right">
+                        <form action="{% url 'backlog' %}" method="get" style="padding-right: 10px">
+                            <div class="input-group">
+                                {{ backlog_search_form.query }}
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-success" type="submit">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <form action="{% url 'backlog' %}" method="get">
+                        <div class="dropdown d-inline float-right" style="padding-right: 10px">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {% if is_filtering %}
+                                    Sort: {{ filter_mode }}
+                                {% else %}
+                                    Sort
+                                {% endif %}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                <button class="dropdown-item" name="sort_option" value="alphabetic">A-Z</button>
+                                <div class="dropright">
+                                    <button class="dropdown-item dropdown-toggle" type="button" id="dropdownMenuButton"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">Platform
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                        {% for platform in user_platforms %}
+                                            <button class="dropdown-item" type="submit" name="sort_option"
+                                                    value="{{ platform.platform_id }}">{{ platform.platform_name }}</button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="dropright">
+                                    <button class="dropdown-item dropdown-toggle" type="button" id="dropdownMenuButton"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">Date Added
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                                        <button class="dropdown-item" name="sort_option" value="date_newest">Newest
+                                            first
+                                        </button>
+                                        <button class="dropdown-item" name="sort_option" value="date_oldest">Oldest
+                                            first
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <hr style="background-color: white">
+                </div>
+            </div>
+            {% if object_list %}
+                <div class="row" style="display: flex;justify-content: center;align-items: center">
+                    {% for game in object_list|slice:game_slice %}
+                        <div class="col-auto">
+                            <a href="{% url 'game-info' game.game_id %}"><img
+                                    alt="{{ game.game_name }}"
+                                    class="rounded
+                                    {% if game.status_id == 2 %}
+                                        border border-info
+                                    {% elif game.is_custom %}
+                                        border border-warning
+                                    {% endif %}"
+                                    data-placement="top"
+                                    data-toggle="tooltip"
+                                    height="200"
+                                    src="{% if not game.is_custom %} {{ game.cover_url }} {% else %} {% static game.cover_url %} {% endif %}"
+                                    style="margin-bottom: 10px;border-width: 3px !important;"
+                                    title="{{ game.game_name }}"
+                                    width="150">
+                                {% if game.status_id == 2 %}
+                                    <span class="badge-caption-lower badge badge-pill badge-info">Now Playing</span>
+                                {% endif %}
+                                {% if game.is_custom %}
+                                    {% if game.status_id == 2 %}
+                                        <span class="badge-caption-higher badge-pill badge-warning">Custom</span>
+                                    {% else %}
+                                        <span class="badge-caption-lower badge badge-pill badge-warning">Custom</span>
+                                    {% endif %}
+                                {% endif %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if remaining_slice %}
+                    <div class="row" style="display: flex;justify-content: center;align-items: center">
+                        {% for game in object_list|slice:remaining_slice %}
+                            <div class="col-auto">
+                                <a href="{% url 'game-info' game.game_id %}"><img
+                                        alt="{{ game.game_name }}"
+                                        class="rounded
+                                        {% if game.is_custom %}
+                                            border border-warning
+                                        {% endif %}"
+                                        data-placement="top"
+                                        data-toggle="tooltip"
+                                        height="200"
+                                        src="{{ game.cover_url }}"
+                                        style="margin-bottom: 10px;border-width: 3px !important;"
+                                        title="{{ game.game_name }}"
+                                        width="150">
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>There don't appear to be any games in your backlog that match your search query. If you're
+                    sure you've added the game you're looking for, check your spelling.</p>
+            {% endif %}
+
+            <div class="row" style="display: flex;justify-content: center;align-items: center">
+                <nav aria-label="Page navigation" style="padding-top: 20px">
+                    <ul class="pagination pagination-lg">
+
+                        {# Skip to first page #}
+                        <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
+                            <a href="{{ url_parameters }}page=1"
+                               class="page-link {% if not page_obj.has_previous %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                               title="Skip to first page">
+                                <i class="bi bi-skip-backward-fill"></i>
+                            </a>
+                        </li>
+
+                        {# Previous page #}
+                        <li class="page-item {% if not page_obj.has_previous %} disabled {% endif %}">
+                            <a href="{% if page_obj.has_previous %}{{ url_parameters }}page={{ page_obj.previous_page_number }}{% endif %}"
+                               class="page-link {% if not page_obj.has_previous %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                               title="Previous page">
+                                <i class="bi bi-caret-left-fill"></i>
+                            </a>
+                        </li>
+
+                        {# Enumerated pages #}
+                        {% for page_num in page_range %}
+                            <li class="page-item">
+                                <a href="{{ url_parameters }}page={{ page_num }}"
+                                   class="page-link {% if page_num == page_obj.number %} bg-light text-dark {% else %} bg-dark text-white {% endif %}"
+                                   title="Page {{ page_num }}">
+                                    {% if page_num == page_obj.number %}
+                                        <b>{{ page_num }}</b>
+                                    {% else %}
+                                        {{ page_num }}
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endfor %}
+
+                        {# Next page #}
+                        <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
+                            <a href="{% if page_obj.has_next %}{{ url_parameters }}page={{ page_obj.next_page_number }}{% endif %}"
+                               class="page-link {% if not page_obj.has_next %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                               title="Next page">
+                                <i class="bi bi-caret-right-fill"></i>
+                            </a>
+                        </li>
+
+                        {# Skip to last page #}
+                        <li class="page-item {% if not page_obj.has_next %} disabled {% endif %}">
+                            <a href="{{ url_parameters }}page={{ last_page }}"
+                               class="page-link {% if not page_obj.has_next %} bg-transparent {% else %} bg-dark text-white {% endif %}"
+                               title="Skip to last page">
+                                <i class="bi bi-skip-forward-fill"></i>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    {% else %}
+        <div class="container-fluid"
+             style="display: flex;flex-direction:column;justify-content: center;align-items: center;height: 85vh;color: white">
+            <div class="row">
+                <div class="col-auto">
+                    <p class="text-center" style="padding-bottom: 10px">
+                        Hey there, <b>{{ request.user.username }}</b>.
+                        <br>
+                        It doesn't look like there are any games in your backlog.
+                        <br>
+                        Perhaps you should add some.
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-auto">
+                    <a href="{% url 'add-game-search' %}" class="btn btn-outline-success">Add a game</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block additional_js %}
+    <script>
+        {# initialize tooltips #}
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        {# stop sort dropdown from closing on click #}
+        $("#parent-element").on("click", ".dropdown-menu", function (e) {
+            $(this).parent().is(".open") && e.stopPropagation();
+        });
+    </script>
+{% endblock %}

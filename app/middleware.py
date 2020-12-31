@@ -1,3 +1,9 @@
+"""
+Custom middleware. Presently, this only serves to send browsers attempting to access Backlogged via its Heroku domain
+an HTTP 301 Moved Permanently response code and redirect them to https://backlogged.games.
+"""
+
+
 from django.shortcuts import redirect
 
 

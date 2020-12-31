@@ -1,0 +1,25 @@
+{% extends 'base/base.html' %}
+{% load static custom_tags %}
+
+
+{% block title %}
+    Changelog
+{% endblock %}
+
+{% block body %}
+    <div class="container"
+         style="display: flex;flex-direction:column;align-items:center;justify-content: center;color: white;height: 85vh">
+        <div class="row">
+            <div class="col-xl-auto">
+                <h1 class="mr-auto d-inline" style="font-family: poppins, sans-serif">changelogged<span
+                        style="color: #03cb98">.</span></h1>
+                <hr style="background-color: white">
+                <h6>What's new in Backlogged {% github_version %}:</h6>
+                <ul>
+                    <li>added penis</li>
+                    <li>added coochie</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

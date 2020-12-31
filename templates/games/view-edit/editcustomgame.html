@@ -1,0 +1,85 @@
+{% extends 'base/base.html' %}
+{% load static crispy_forms_filters %}
+
+
+{% block title %}
+    Edit Custom Game
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid"
+         style="display: flex;flex-direction:column;justify-content: center;align-items: center;height: 80vh;color: white">
+        <form action="{% url 'edit-custom-game' game.game_id %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-auto">
+                    <p>
+                        <img id="coverPreview" src="{% static game.cover_url %}"
+                             alt=""
+                             class="rounded mr-auto">
+                    </p>
+                    <div class="custom-file">
+                        {{ form.cover_img }}
+                        <label class="custom-file-label"
+                               for="{{ form.cover_img.auto_id }}">{{ form.cover_img.label }}</label>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <p>
+                        {{ form.game_name|as_crispy_field }}
+                        {{ form.involved_companies|as_crispy_field }}
+                    </p>
+                    <hr style="background-color: white">
+                    <p>
+                        {{ form.summary|as_crispy_field }}
+                    </p>
+                    <hr style="background-color: white">
+                    <p>
+                        <b>What platform do you have this game on?</b>
+                    </p>
+                    <p>
+                        {{ form.platform }}
+                        <button type="submit" class="btn btn-outline-success">
+                            Continue
+                        </button>
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block additional_js %}
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aaronrussell/jquery-simply-countable@master/jquery.simplyCountable.js"></script>
+
+    <!--suppress JSUnresolvedVariable -->
+    <script>
+        {# initalize bootstrap tooltips #}
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+
+        {# initialize bs-custom-file-input #}
+        $(document).ready(function () {
+            bsCustomFileInput.init()
+        })
+
+        {# change cover art on image upload #}
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#coverPreview').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $("#customFile").change(function () {
+            readURL(this);
+        });
+    </script>
+{% endblock %}

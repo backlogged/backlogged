@@ -1,0 +1,32 @@
+{% extends 'base/base.html' %}
+{% load crispy_forms_filters %}
+
+{% block body %}
+    <div class="container-xl" style="display:flex;justify-content:center;align-items:center;height:90vh;color:white">
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group row">
+                <div class="col-xl-auto">
+                    <h1>{% block form_heading %}{% endblock %}</h1>
+                </div>
+            </div>
+            {% for field in form %}
+                <div class="form-group row">
+                    <div class="col-xl-auto">
+                        {{ field|as_crispy_field }}
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="d-flex flex-row">
+                <button type="submit" class="btn btn-outline-success">{% block button_text %}{% endblock %}</button>
+                <span class="pr-2"></span>
+                {% block cancel_button %}
+                {% endblock %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block footer %}
+{#intentionally empty#}
+{% endblock %}

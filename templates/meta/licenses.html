@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}
+    Licenses
+{% endblock %}
+
+{% block body %}
+    <div class="container" style="color: white;padding-top: 3em;padding-left: 5em;padding-right: 5em;">
+        <div class="row">
+            <div class="col-xl">
+                <h1>Third-party software licenses</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl">
+                <hr style="background-color: white">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-auto">
+                Backlogged makes use of third-party open source software. Some of that software requires that a copy
+                of the software's license be made publicly available somewhere on this site. Those licenses can be
+                found here.
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl">
+                <hr style="background-color: white">
+            </div>
+        </div>
+        {% for license in licenses %}
+            <div class="row">
+                <div class="col-xl-auto">
+                    <div class="float-left">
+                        <h2>{{ license.Name }}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-auto">
+                    <h5>{{ license.License }}</h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-auto">
+                    {{ license.LicenseText|linebreaksbr }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <hr style="background-color: white; {% if forloop.last %} visibility: hidden {% endif %}">
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+{% endblock %}

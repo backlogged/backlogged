@@ -1,0 +1,23 @@
+{% extends 'base/base.html' %}
+{% load static custom_tags %}
+
+{% block title %}
+    About
+{% endblock %}
+
+{% block body %}
+    <div class="container"
+         style="display: flex;flex-direction:column;align-items:center;justify-content: center;color: white;height: 85vh">
+        <div class="row">
+            <div class="col-xl-auto">
+                <h1 class="mr-auto d-inline" style="font-family: poppins, sans-serif">backlogged<span
+                        style="color: #03cb98">.</span></h1>
+                <p class="d-inline">{% github_version %}</p>
+                <hr style="background-color: white">
+                <p>&#169; 2020 The Backlogged Project. All rights reserved.</p>
+                <p>Video game data provided by <a href="https://igdb.com" target="_blank">IGDB.com</a>.</p>
+                <p>Backlogged makes use of <a href="{% url 'licenses' %}">third-party open source software</a>.</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

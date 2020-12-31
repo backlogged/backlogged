@@ -1,0 +1,94 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+
+{% block title %}
+    Custom Game Preview
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid"
+         style="display: flex;flex-direction:column;justify-content: center;align-items: center;height: 80vh;color: white">
+        <div class="row">
+            <div class="col-auto">
+                <img src="data:image/png;base64,{{ custom_game.cover_img }}" alt="" class="rounded mr-auto"
+                     style="width: 264px;height: 352px">
+            </div>
+            <div class="col-auto">
+                <p>
+                    <b>{{ custom_game.name }}</b>
+                    {% if custom_game.status_id == 1 %}
+                        <span style="padding-left: 3px;">
+                            <span class="badge badge-pill badge-success text-white">Backlog</span>
+                        </span>
+                    {% elif custom_game.status_id == 2 %}
+                        <span style="padding-left: 3px;">
+                            <span class="badge badge-pill badge-info text-white">Now Playing</span>
+                        </span>
+                    {% endif %}
+                    <span style="padding-left: 3px;">
+                            <span class="badge badge-pill badge-warning text-white" data-toggle="tooltip"
+                                  data-placement="top" title="You created this game entry from scratch.">Custom</span>
+                    </span>
+                    <br>
+                    {{ custom_game.involved_companies }}
+                </p>
+                <hr style="background-color: white">
+                {% if custom_game.full_summary %}
+                    <p>
+                        {% if custom_game.short_summary %}
+                            <b>Summary:</b> {{ custom_game.short_summary|linebreaksbr }}
+                            <a href="#" data-toggle="modal" data-target="#fullSummary">Read more</a>
+                        {% else %}
+                            <b>Summary:</b> {{ custom_game.full_summary|linebreaksbr }}
+                        {% endif %}
+                    </p>
+                    {% if custom_game.short_summary %}
+                        <div class="modal fade" id="fullSummary" tabindex="-1" aria-labelledby="fullSummary"
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content bg-dark">
+                                    <div class="modal-header bg-dark">
+                                        <h5 class="modal-title">{{ custom_game.name }}</h5>
+                                        <button class="close" type="button" data-dismiss="modal" aria-label="close">
+                                            <span aria-hidden="true" style="color: white">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        {{ custom_game.full_summary|linebreaksbr }}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Close
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <hr style="background-color: white">
+                {% endif %}
+                <p>
+                    Add this game to your {{ custom_game.status_name }} for
+                    <b>{{ custom_game.recorded_platform_name }}</b>?
+                </p>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% if custom_game.status_id == 1 %}
+                        <button id="addButton" type="submit" class="btn btn-outline-success" name="submit"
+                                value="true"><span
+                                id="buttonText">Add to my backlog</span>
+                        </button>
+                    {% elif custom_game.status_id == 2 %}
+                        <button id="addButton" type="submit" class="btn btn-outline-info" name="submit"
+                                value="true"><span
+                                id="buttonText">Add to Now Playing</span>
+                        </button>
+                    {% endif %}
+                    <button class="btn btn-outline-danger" onclick="window.history.go(-1); return false;">
+                        Go back
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

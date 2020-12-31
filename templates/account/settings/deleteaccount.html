@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% load static crispy_forms_filters %}
+
+{% block title %}
+    Delete Account
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid"
+         style="display: flex;justify-content: center;align-items: center;height: 85vh;color: white">
+        <div class="d-flex flex-column">
+            <div class="d-flex flex-row">
+                <h1>Are you sure?</h1>
+            </div>
+            <div class="d-flex flex-row">
+                <p>
+                    You're about to permanently delete your Backlogged account.
+                    <br>
+                    <br>
+                    If you proceed, all data associated with your account, including your backlog,
+                    <br>
+                    will be gone forever.
+                    <br>
+                    <br>
+                    <b>This action cannot be undone.</b>
+                </p>
+            </div>
+            <div class="d-flex flex-row">
+                <button class="btn btn-outline-danger" data-toggle="modal" data-target="#deleteModal">
+                    Delete account
+                </button>
+                <span class="pr-2"></span>
+                <a href="{% url 'settings' %}" class="btn btn-outline-success">Cancel</a>
+            </div>
+            <div class="modal fade" id="deleteModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header bg-dark">
+                            <h3 class="modal-title">Sorry to see you go.</h3>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Enter your password to delete your account.</p>
+                            <form action="" method="post" id="passwordForm">
+                                {% csrf_token %}
+                                {{ form.password|as_crispy_field }}
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-danger" type="submit" id="deleteButton" form="passwordForm" disabled>
+                                Delete account
+                            </button>
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {#intentionally empty#}
+{% endblock %}
+
+{% block additional_js %}
+    <script>
+        {% if form.errors %}
+            $(window).on("load", function () {
+                $("#deleteModal").modal("show");
+            });
+        {% endif %}
+
+        function checkPasswordField() {
+            const deleteButton = document.getElementById("deleteButton")
+            deleteButton.disabled = !document.getElementById("id_password").value;
+        }
+    </script>
+{% endblock %}
