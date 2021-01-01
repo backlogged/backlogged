@@ -1,4 +1,6 @@
-# Copyright
+# Backlogged
+
+This repository hosts the source code for Backlogged (https://backlogged.games).
 
 Backlogged © The Backlogged Project. All rights reserved.
 
