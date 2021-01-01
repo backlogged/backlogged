@@ -159,8 +159,9 @@
                     </div>
                 {% endif %}
             {% else %}
-                <p>There don't appear to be any games in your backlog that match your search query. If you're
-                    sure you've added the game you're looking for, check your spelling.</p>
+                <p class="text-center">There aren't any games in your backlog that match your search query.
+                But you can always add one that does.</p>
+                <p class="text-center"><a href="{% url 'add-game' %}" class="btn btn-outline-success">Add a game</a></p>
             {% endif %}
 
             <div class="row" style="display: flex;justify-content: center;align-items: center">

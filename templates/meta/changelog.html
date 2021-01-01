@@ -7,15 +7,16 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container"
-         style="display: flex;flex-direction:column;align-items:center;justify-content: center;color: white;height: 85vh">
+    <div class="container" style="color: white;padding-top: 3em;padding-left: 5em;padding-right: 5em;">
         <div class="row">
             <div class="col-xl-auto">
                 <h1 class="mr-auto d-inline" style="font-family: poppins, sans-serif">changelogged<span
                         style="color: #03cb98">.</span></h1>
                 <hr style="background-color: white">
                 <h6>What's new in Backlogged {% github_release 'tag' %}:</h6>
-                {% github_release 'body' %}
+                {% autoescape off %}
+                    {% github_release 'body'|linebreaksbr %}
+                {% endautoescape %}
             </div>
         </div>
     </div>

@@ -7,6 +7,7 @@ import os
 from django import template
 from github import Github
 from github.GithubException import UnknownObjectException
+from markdown2 import markdown
 
 register = template.Library()
 
@@ -39,4 +40,4 @@ def get_latest_github_release(mode: str):
         if mode == "tag":
             return release.tag_name
         elif mode == "body":
-            return release.body
+            return markdown(release.body)

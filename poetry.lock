@@ -137,6 +137,14 @@ protobuf = "*"
 requests = "*"
 
 [[package]]
+name = "markdown2"
+version = "2.3.10"
+description = "A fast and complete Python implementation of Markdown"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pillow"
 version = "8.0.1"
 description = "Python Imaging Library (Fork)"
@@ -302,7 +310,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.0"
-content-hash = "2b8b8dfc8baabf7bc66abd9024fad204b10510b94466b4218f4dcad552d456f1"
+content-hash = "d5a24c0eb117403cb8aba58b27baac331244b9cfb2082b592c3722dc013908f9"
 
 [metadata.files]
 arrow = [
@@ -355,6 +363,10 @@ idna = [
 igdb-api-v4 = [
     {file = "igdb-api-v4-0.0.3.tar.gz", hash = "sha256:961bb1d7be82e6e6c222b1d1b2b2b283480612608a7d530fbbc26567bcca4bf6"},
     {file = "igdb_api_v4-0.0.3-py3-none-any.whl", hash = "sha256:235036ab4350d93e8ba8e537660a22d8f2e936f4ae110700b92ee2c985bb2fe5"},
+]
+markdown2 = [
+    {file = "markdown2-2.3.10-py2.py3-none-any.whl", hash = "sha256:fef148e5fd68d4532286c3e2943e9d2c076a8ad781b0a70a9d599a0ffe91652d"},
+    {file = "markdown2-2.3.10.tar.gz", hash = "sha256:85956d8119fa6378156fef65545d66705a842819d2e1b50379a2b9d2aaa17cf0"},
 ]
 pillow = [
     {file = "Pillow-8.0.1-cp36-cp36m-macosx_10_10_x86_64.whl", hash = "sha256:b63d4ff734263ae4ce6593798bcfee6dbfb00523c82753a3a03cbc05555a9cc3"},
