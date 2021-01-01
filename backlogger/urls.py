@@ -47,11 +47,11 @@ urlpatterns = [
     path('backlog/games/edit-custom-game/id=<str:game_id>', EditCustomGameView.as_view(), name='edit-custom-game'),
 
     # Adding Games
-    path('backlog/games/add-game/', AddGameSearchResultsView.as_view(), name='add-game'),
-    path('backlog/games/add-game/page=<int:page>/', AddGameSearchResultsView.as_view()),
     path('backlog/games/add-game/search/', AddGameSearchView.as_view(), name='add-game-search'),
-    path('backlog/games/add-custom-game', AddCustomGameView.as_view(), name='add-custom-game'),
-    path('backlog/games/custom-game-preview/', CustomGamePreviewView.as_view(),
+    path('backlog/games/add-game/search/page=<int:page>/', AddGameSearchView.as_view()),
+    path('backlog/games/add-game/', AddGameView.as_view(), name='add-game'),
+    path('backlog/games/add-game/custom/', AddCustomGameView.as_view(), name='add-custom-game'),
+    path('backlog/games/add-game/custom/preview', CustomGamePreviewView.as_view(),
          name='custom-game-preview')
 
 ]

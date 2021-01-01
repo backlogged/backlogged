@@ -32,6 +32,12 @@
                     <hr style="background-color: white">
                     <p>
                         {{ form.summary|as_crispy_field }}
+                        <span id="charCount" class="d-flex flex-row-reverse">
+                            <span>&nbsp;characters</span>
+                            <span id="maxChars">3000</span>
+                            <span>&nbsp;/&nbsp;</span>
+                            <span id="currentChars">0</span>
+                        </span>
                     </p>
                     <hr style="background-color: white">
                     <p>
@@ -39,7 +45,7 @@
                     </p>
                     <p>
                         {{ form.platform }}
-                        <button type="submit" class="btn btn-outline-success">
+                        <button type="submit" id="continue" class="btn btn-outline-success">
                             Continue
                         </button>
                     </p>
@@ -65,16 +71,19 @@
     <!--suppress JSUnresolvedVariable -->
     <script>
         {# initalize bootstrap tooltips #}
+
         $(function () {
             $('[data-toggle="tooltip"]').tooltip()
         })
 
         {# initialize bs-custom-file-input #}
+
         $(document).ready(function () {
             bsCustomFileInput.init()
         })
 
         {# change cover art on image upload #}
+
         function readURL(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -90,5 +99,30 @@
         $("#customFile").change(function () {
             readURL(this);
         });
+
+        {# summary character length counter #}
+
+        function characterCounter() {
+            const characterCount = $("#id_summary").val().length,
+                current = $("#currentChars"),
+                maximum = $("#maxChars"),
+                count = document.getElementById("charCount"),
+                continueButton = document.getElementById("continue")
+
+            current.text(characterCount);
+
+            if (characterCount >= 2500 && characterCount < 3000) {
+                count.classList.add("text-warning");
+            } else {
+                count.classList.remove("text-warning")
+            }
+
+            if (characterCount >= 3000) {
+                continueButton.disabled = characterCount !== 3000;
+                count.classList.add("text-danger");
+            } else {
+                count.classList.remove("text-danger")
+            }
+        }
     </script>
 {% endblock %}

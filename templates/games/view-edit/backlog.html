@@ -19,7 +19,7 @@
     </li>
     {% if object_list or now_playing or is_searching or is_filtering %}
         <li class="nav-item active" style="padding-right: 10px">
-            <a href="{% url 'add-game-search' %}" class="btn btn-outline-success">Add a game</a>
+            <a href="{% url 'add-game' %}" class="btn btn-outline-success">Add a game</a>
         </li>
     {% endif %}
 {% endblock %}
@@ -124,7 +124,7 @@
                                 {% endif %}
                                 {% if game.is_custom %}
                                     {% if game.status_id == 2 %}
-                                        <span class="badge-caption-higher badge-pill badge-warning">Custom</span>
+                                        <span class="badge-caption-higher badge badge-pill badge-warning">Custom</span>
                                     {% else %}
                                         <span class="badge-caption-lower badge badge-pill badge-warning">Custom</span>
                                     {% endif %}
@@ -146,10 +146,13 @@
                                         data-placement="top"
                                         data-toggle="tooltip"
                                         height="200"
-                                        src="{{ game.cover_url }}"
+                                        src="{% if not game.is_custom %} {{ game.cover_url }} {% else %} {% static game.cover_url %} {% endif %}"
                                         style="margin-bottom: 10px;border-width: 3px !important;"
                                         title="{{ game.game_name }}"
                                         width="150">
+                                    {% if game.is_custom %}
+                                        <span class="badge-caption-lower badge badge-pill badge-warning">Custom</span>
+                                    {% endif %}
                                 </a>
                             </div>
                         {% endfor %}
@@ -235,7 +238,7 @@
             </div>
             <div class="row">
                 <div class="col-auto">
-                    <a href="{% url 'add-game-search' %}" class="btn btn-outline-success">Add a game</a>
+                    <a href="{% url 'add-game' %}" class="btn btn-outline-success">Add a game</a>
                 </div>
             </div>
         </div>

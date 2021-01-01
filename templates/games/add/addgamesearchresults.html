@@ -15,8 +15,7 @@
             </div>
             <div class="col-md-6">
                 <div class="float-right" style="margin-top: 10px">
-                    <form action="{% url 'add-game' %}" method="get">
-                        {% csrf_token %}
+                    <form action="{% url 'add-game-search' %}" method="get">
                         <div class="input-group">
                             {{ search_form.query }}
                             <div class="input-group-append">
@@ -71,7 +70,7 @@
                     <li class="page-item {% if not page > 1 %} disabled {% endif %}"><a
                             class="page-link
                                     {% if not page > 1 %} bg-transparent {% else %} bg-dark text-white {% endif %}"
-                            href="{% url 'add-game' %}page={{ page|add:'-1' }}">
+                            href="{% url 'add-game-search' %}page={{ page|add:'-1' }}{{ url_parameters }}">
                         <i class="bi bi-caret-left-fill"></i>
                         Previous</a>
                     </li>
@@ -79,7 +78,7 @@
                     {# Next page #}
                     <li class="page-item {% if not next_page_exists %} disabled {% endif %}"><a
                             class="page-link {% if not next_page_exists %} bg-transparent {% else %} bg-dark text-white {% endif %}"
-                            href="{% url 'add-game' %}page={{ page|add:'1' }}">Next
+                            href="{% url 'add-game-search' %}page={{ page|add:'1' }}{{ url_parameters }}">Next
                         <i class="bi bi-caret-right-fill"></i></a>
                     </li>
 

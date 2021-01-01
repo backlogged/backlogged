@@ -56,10 +56,11 @@
             <div class="container"
                  style="display: flex;align-items: center;justify-content: center;padding-top: 10px;padding-bottom: 10px">
                 <span class="text-muted">
-                    <a href="{% url 'about' %}" class="text-muted">
-                        <span style="font-family: poppins, sans-serif">backlogged.</span> {% github_version %}
+                    <a href="{% url 'about' %}" class="text-muted" title="About">
+                        <span style="font-family: poppins, sans-serif">backlogged.</span> {% github_release 'tag' %}
                     </a> &bull;
-                    <a href="{% url 'changelog' %}" class="text-muted">Changelog</a>
+                    <a href="{% github_repo %}" target="_blank" class="text-muted" title="GitHub"><i id="githubLogo" class="bi bi-github"></i></a> &bull;
+                    <a href="{% url 'changelog' %}" class="text-muted" title="Changelog">Changelog</a>
                 </span>
             </div>
         </footer>
@@ -72,6 +73,20 @@
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
     <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
+    <script>
+        const githubLogo = document.getElementById("githubLogo")
+
+        githubLogo.onmouseenter = function () {
+            githubLogo.classList.add("text-white")
+            githubLogo.classList.remove("text-muted")
+        };
+
+        githubLogo.onmouseleave = function () {
+            githubLogo.classList.add("text-muted")
+            githubLogo.classList.remove("text-white")
+        };
+    </script>
 
     {% block additional_js %}
     {% endblock %}

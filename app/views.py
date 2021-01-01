@@ -5,8 +5,8 @@ Views.
 import json
 import os
 import urllib.parse
-from datetime import datetime
 
+import arrow
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
@@ -24,6 +24,9 @@ timezones = models.UserTimezone.objects
 
 
 class HomePageView(TemplateView):
+    """
+    The home page.
+    """
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect("backlog")
@@ -32,17 +35,26 @@ class HomePageView(TemplateView):
 
 
 class SignUpView(CreateView):
+    """
+    The account creation page.
+    """
     form_class = UserCreationForm
     success_url = "/login"
     template_name = "account/registration/signup.html"
 
 
 class SignInView(LoginView):
+    """
+    The login page.
+    """
     redirect_authenticated_user = True
     template_name = "account/registration/login.html"
 
 
 class BacklogView(LoginRequiredMixin, ListView):
+    """
+    The backlog page.
+    """
     login_url = "/login"
     template_name = "games/view-edit/backlog.html"
     paginate_by = 30
@@ -100,7 +112,6 @@ class BacklogView(LoginRequiredMixin, ListView):
         context.update({
             "backlog_search_form": BacklogSearchForm(self.search_query),
             "filter_form": BacklogFilterForm(self.filter_mode),
-            "add_game_search_form": GameSearchForm()
         })
 
         user_id = self.request.user.id
@@ -159,8 +170,11 @@ class BacklogView(LoginRequiredMixin, ListView):
         return context
 
 
-class AddGameSearchView(LoginRequiredMixin, FormView):
-    template_name = "games/add/addgamesearch.html"
+class AddGameView(LoginRequiredMixin, FormView):
+    """
+    The page where users go to begin the process of adding a game.
+    """
+    template_name = "games/add/addgame.html"
     form_class = GameSearchForm
 
     def get_context_data(self, **kwargs):
@@ -173,8 +187,10 @@ class AddGameSearchView(LoginRequiredMixin, FormView):
         return context
 
 
-class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
-
+class AddGameSearchView(LoginRequiredMixin, TemplateView):
+    """
+    Displays search results to users searching for games to add.
+    """
     def get(self, request, *args, **kwargs):
         search_form = GameSearchForm(self.request.GET)
         user_id = self.request.user.id
@@ -196,17 +212,23 @@ class AddGameSearchResultsView(LoginRequiredMixin, TemplateView):
         next_page_exists = bool(
             helpers.get_search_view_dicts(search_data["query"], offset=offset + 50, user_id=user_id))
 
+        url_parameters = helpers.request_constructor(self.request.GET)
+
         context = {
             "game_info_dicts": game_info_dicts,
             "search_form": search_form,
             "page": page,
-            "next_page_exists": next_page_exists
+            "next_page_exists": next_page_exists,
+            "url_parameters": url_parameters
         }
 
         return render(request, template_name="games/add/addgamesearchresults.html", context=context)
 
 
 class AddCustomGameView(LoginRequiredMixin, FormView):
+    """
+    Provides an interface for users to add custom games.
+    """
     form_class = CustomGameForm
     template_name = "games/add/addcustomgame.html"
 
@@ -233,6 +255,9 @@ class AddCustomGameView(LoginRequiredMixin, FormView):
 
 
 class CustomGamePreviewView(LoginRequiredMixin, FormView):
+    """
+    Presents a preview of a custom game entry to a user before adding it to their backlog.
+    """
     form_class = CustomGameSubmit
     template_name = "games/add/customgamepreview.html"
 
@@ -254,7 +279,7 @@ class CustomGamePreviewView(LoginRequiredMixin, FormView):
                                     platform_name=game_dict["recorded_platform_name"],
                                     status_id=game_dict["status_id"], status_name=game_dict["status_name"],
                                     cover_url=cover_img.name,
-                                    date_added=datetime.today().date(),
+                                    date_added=arrow.now().date(),
                                     is_custom=True)
 
         custom.create(user_id=user.id,
@@ -267,6 +292,9 @@ class CustomGamePreviewView(LoginRequiredMixin, FormView):
 
 
 class EditCustomGameView(LoginRequiredMixin, FormView):
+    """
+    Provides an interface for users to edit custom game entries they've created.
+    """
     form_class = CustomGameForm
     template_name = "games/view-edit/editcustomgame.html"
 
@@ -278,7 +306,7 @@ class EditCustomGameView(LoginRequiredMixin, FormView):
             "game_name": backlogged.game_name,
             "involved_companies": backlogged.custom_data.involved_companies,
             "summary": backlogged.custom_data.summary,
-            "platform": backlogged.platform_id
+            "platform": f"{backlogged.platform_id},{backlogged.platform_name}"
         })
 
         return initial
@@ -317,6 +345,10 @@ class EditCustomGameView(LoginRequiredMixin, FormView):
 
 
 class GameInfoView(LoginRequiredMixin, FormView):
+    """
+    Displays information about a single game and provides an interface for users to edit details about its status in
+    their backlog.
+    """
     template_name = "games/view-edit/gameinfo.html"
     form_class = GameUpdateForm
 
@@ -392,7 +424,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
                            cover_url=cover_url,
                            platform_id=platform_id, platform_name=platform_name,
                            status_name=status_name, status_id=status_id,
-                           date_added=datetime.today().date())
+                           date_added=arrow.now().date())
         else:
             backlogged = backlog.get(game_id=game_id, user_id=user_id)
 
@@ -421,10 +453,16 @@ class GameInfoView(LoginRequiredMixin, FormView):
 
 
 class AccountSettingsView(LoginRequiredMixin, TemplateView):
+    """
+    The main page for user account settings.
+    """
     template_name = "account/settings/accountsettings.html"
 
 
 class ChangeUsernameView(LoginRequiredMixin, UpdateView):
+    """
+    Provides an interface for users to change their username.
+    """
     model = User
     fields = ["username"]
     success_url = "/settings"
@@ -435,11 +473,17 @@ class ChangeUsernameView(LoginRequiredMixin, UpdateView):
 
 
 class ChangeUserPasswordView(PasswordChangeView):
+    """
+    Provides an interface for users to change their password.
+    """
     template_name = "account/settings/changepassword.html"
     success_url = "/settings"
 
 
-class ChangeTimezoneView(FormView):
+class ChangeTimezoneView(LoginRequiredMixin, FormView):
+    """
+    Provides an interface for users to change their time zone.
+    """
     success_url = "/settings"
     template_name = "account/settings/changetimezone.html"
     form_class = TimezoneUpdateForm
@@ -460,6 +504,9 @@ class ChangeTimezoneView(FormView):
 
 
 class DeleteAccountView(LoginRequiredMixin, FormView):
+    """
+    Provides an interface for users to delete their account.
+    """
     template_name = "account/settings/deleteaccount.html"
     form_class = PasswordCheckForm
 
@@ -470,10 +517,15 @@ class DeleteAccountView(LoginRequiredMixin, FormView):
         return form_kwargs
 
     def form_valid(self, form):
+        self.request.user.delete()
+
         return redirect("home")
 
 
 class AdminRedirectView(LoginRequiredMixin, TemplateView):
+    """
+    Redirects staff users to the administration page and non-staff users to an error page.
+    """
     def get(self, request, *args, **kwargs):
         if self.request.user.is_staff:
             return redirect(f"/{os.getenv('ADMIN_URL')}")
@@ -482,14 +534,29 @@ class AdminRedirectView(LoginRequiredMixin, TemplateView):
 
 
 class AboutView(TemplateView):
+    """
+    Displays information about Backlogged.
+    """
     template_name = "meta/about.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["current_year"] = arrow.now("America/New_York").year
+
+        return context
 
 
 class ChangelogView(TemplateView):
+    """
+    Displays the changelog for the latest version of Backlogged.
+    """
     template_name = "meta/changelog.html"
 
 
 class SoftwareLicensesView(TemplateView):
+    """
+    Displays licenses for some of the third-party software Backlogged uses.
+    """
     template_name = "meta/licenses.html"
 
     def get_context_data(self, **kwargs):

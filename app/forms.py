@@ -14,7 +14,7 @@ class GameSearchForm(forms.Form):
     Faciliates IGDB-dependent game searches.
     """
     # static fields
-    query = forms.CharField(max_length=1024, widget=forms.TextInput(attrs={"placeholder": "Search for a game"}))
+    query = forms.CharField(max_length=1024)
 
     def __init__(self, *args, **kwargs):
         # super call
@@ -25,7 +25,7 @@ class GameSearchForm(forms.Form):
         self.helper.form_show_labels = False
 
         # html attribute assignments
-        self.fields["query"].widget.attrs["class"] = "form-control"
+        self.fields["query"].widget.attrs = {"placeholder": "Search for a game", "class": "form-control"}
 
 
 class BacklogSearchForm(forms.Form):
@@ -33,7 +33,7 @@ class BacklogSearchForm(forms.Form):
     Facilitates backlog game searches, which use Backlogged's own database.
     """
     # static fields
-    query = forms.CharField(max_length=1024, widget=forms.TextInput(attrs={"placeholder": "Search your backlog"}))
+    query = forms.CharField(max_length=1024)
 
     def __init__(self, *args, **kwargs):
         # super call
@@ -44,7 +44,7 @@ class BacklogSearchForm(forms.Form):
         self.helper.form_show_labels = False
 
         # html attribute assignments
-        self.fields["query"].widget.attrs["class"] = "form-control"
+        self.fields["query"].widget.attrs = {"placeholder": "Search your backlog", "class": "form-control"}
 
 
 class BacklogFilterForm(forms.Form):
@@ -82,7 +82,7 @@ class GameUpdateForm(forms.Form):
         except KeyError:
             pass
         else:
-            # dynamic platform field initialization
+            # platform field
             self.platform_list = []
             for platform in self.game_dict["platforms"]:
                 platform_str = f"{platform['platform_id']},{platform['platform_name']}"
@@ -92,28 +92,9 @@ class GameUpdateForm(forms.Form):
 
             # html attribute assignments
             self.fields["platform"].widget.attrs["class"] = "select btn btn-secondary"
-            self.fields["now_playing"].widget.attrs["id"] = "npCheckbox"
-            self.fields["now_playing"].widget.attrs["onclick"] = "statusToggle()"
+            self.fields["now_playing"].widget.attrs = {"id": "npCheckbox", "onclick": "statusToggle()"}
             if self.num_now_playing >= 10:
-                self.fields["now_playing"].widget.attrs["disabled"] = ""
-                self.fields["now_playing"].widget.attrs["style"] = "pointer-events: none;"
-
-
-class TimezoneUpdateForm(forms.Form):
-    """
-    Faciliates the updating of a user's time zone.
-    """
-
-    def __init__(self, *args, **kwargs):
-        # super call
-        super().__init__(*args, **kwargs)
-
-        # timezone field initialization
-        self.timezone_list = []
-        for tz in pytz.all_timezones:
-            self.timezone_list.append((tz, tz.replace("_", " ")))
-
-        self.fields["timezone"] = forms.ChoiceField(label="Time zone", choices=self.timezone_list)
+                self.fields["now_playing"].widget.attrs = {"disabled": "", "style": "pointer-events: none;"}
 
 
 class CustomGameForm(forms.Form):
@@ -121,12 +102,9 @@ class CustomGameForm(forms.Form):
     Faciliates adding and editing custom games.
     """
     # static fields
-    game_name = forms.CharField(max_length=1024,
-                                widget=forms.TextInput(attrs={"placeholder": "Game name (e.g. Sonic the Hedgehog 2)"}))
-    involved_companies = forms.CharField(max_length=1024, required=False, widget=forms.TextInput(
-        attrs={"placeholder": "Involved companies (e.g. Sega, Sonic Team) (optional)"}))
-    summary = forms.CharField(max_length=1024, widget=forms.TextInput(attrs={"placeholder": "Game summary (optional)"}),
-                              required=False)
+    game_name = forms.CharField(max_length=1024)
+    involved_companies = forms.CharField(max_length=1024, required=False)
+    summary = forms.CharField(max_length=3000, widget=forms.Textarea, required=False)
     cover_img = forms.ImageField(label="Cover art (optional)", required=False)
     now_playing = forms.BooleanField(required=False)
 
@@ -152,18 +130,20 @@ class CustomGameForm(forms.Form):
         self.fields["platform"] = forms.ChoiceField(choices=self.platform_list)
 
         # html attribute assignments
-        self.fields["involved_companies"].widget.attrs["style"] = "width: 35em"
+        self.fields["involved_companies"].widget.attrs = {
+            "placeholder": "Involved companies (e.g. Sega, Sonic Team) (optional)", "style": "width: 35em"
+        }
 
-        self.fields["game_name"].widget.attrs["style"] = "width: 20em"
+        self.fields["game_name"].widget.attrs = {"placeholder": "Game name (e.g. Sonic the Hedgehog 2)",
+                                                 "style": "width: 20em"}
 
-        self.fields["summary"].widget.attrs["style"] = "height: 6em"
+        self.fields["summary"].widget.attrs = {"placeholder": "Game summary (optional)", "style": "height: 116px;",
+                                               "oninput": "characterCounter();"}
 
-        self.fields["platform"].widget.attrs["class"] = "select btn btn-secondary"
+        self.fields["platform"].widget.attrs = {"class": "select btn btn-secondary"}
 
-        self.fields["cover_img"].widget.attrs["type"] = "file"
-        self.fields["cover_img"].widget.attrs["class"] = "custom-file-input"
-        self.fields["cover_img"].widget.attrs["id"] = "customFile"
-        self.fields["cover_img"].widget.attrs["style"] = "width: 264px"
+        self.fields["cover_img"].widget.attrs = {"type": "file", "class": "custom-file-input", "id": "customFile",
+                                                 "style": "width: 264px"}
 
         if self.num_now_playing >= 10:
             self.fields["now_playing"].widget.attrs["disabled"] = ""
@@ -171,11 +151,34 @@ class CustomGameForm(forms.Form):
 
 
 class CustomGameSubmit(forms.Form):
+    """
+    Submits custom game entries.
+    """
     # static fields
     submit = forms.CharField()
 
 
+class TimezoneUpdateForm(forms.Form):
+    """
+    Faciliates the updating of a user's time zone.
+    """
+
+    def __init__(self, *args, **kwargs):
+        # super call
+        super().__init__(*args, **kwargs)
+
+        # timezone field initialization
+        self.timezone_list = []
+        for tz in pytz.all_timezones:
+            self.timezone_list.append((tz, tz.replace("_", " ")))
+
+        self.fields["timezone"] = forms.ChoiceField(label="Time zone", choices=self.timezone_list)
+
+
 class PasswordCheckForm(forms.Form):
+    """
+    Checks user passwords.
+    """
     # static fields
     password = forms.CharField(widget=forms.PasswordInput())
 
@@ -196,7 +199,5 @@ class PasswordCheckForm(forms.Form):
 
         if not self.user.check_password(password):
             raise forms.ValidationError("That's the wrong password.")
-        else:
-            self.user.delete()
 
         return password

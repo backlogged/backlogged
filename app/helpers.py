@@ -7,12 +7,13 @@ import base64
 import os
 import re
 import string
+import urllib.parse
 import uuid
 
 import arrow
 import requests
 from django.core.files.base import ContentFile
-from django.http import HttpRequest
+from django.http import HttpRequest, QueryDict
 from igdb.igdbapi_pb2 import GameResult, PlatformResult
 from igdb.wrapper import IGDBWrapper
 
@@ -45,6 +46,7 @@ def get_search_view_dicts(search: str, user_id: str, offset: int = 0):
     @param search: The search query to send to IGDB, determined by user input into an on-site search form.
     @param offset: Tells IGBD how many results to skip. This value is calculated in AddGameSearchResultsView() and used
     for pagination.
+    @param user_id: The ID of a user.
     @return: A list of dictionaries containing information about the games retrieved from IGDB.
     """
     game_info_dicts = []
@@ -83,6 +85,7 @@ def get_game_info_dict(game_id: int, mode: str, user_id: int):
     @param game_id: The game's unique identifier.
     @param mode: Defines which kind of game dictionary to get ("igdb" for games on IGDB or
     "custom" for games created by a user).
+    @param user_id: The ID of a user.
     @return: A dictionary containing information about the game identified by game_id.
     """
 
@@ -119,6 +122,7 @@ def get_game_info_dict(game_id: int, mode: str, user_id: int):
         for company in game.involved_companies:
             if company.developer or company.publisher:
                 companies.add(company.company.name)
+
         game_dict["involved_companies"] = ", ".join(companies)
 
         game_dict["platforms"].extend(platform_handler(game.platforms))
@@ -240,11 +244,16 @@ def format_summary(summary: str, game_dict: dict):
     for i in range(1, newlines + 1):
         try:
             index = split_summary.index(" ", max_summary_line_length + insertion_skips)
+        except ValueError:
+            index = max_summary_line_length + insertion_skips
+
+        try:
             split_summary.insert(index, "\n")
             split_summary.pop(index + 1)
             insertion_skips = index
-        except ValueError:
+        except IndexError:
             break
+
     try:
         while split_summary[-4] in string.punctuation + string.whitespace:
             split_summary.pop(-4)
@@ -324,20 +333,20 @@ def pagination_helper(page: int, last_page: int):
     return page_range
 
 
-def request_constructor(querydict: dict, excluded=None):
+def request_constructor(querydict: QueryDict, excluded=None):
     """
     Constructs request parameter strings from dictionaries.
     @param querydict: A dictionary of request parameters.
     @param excluded: A list of parameters to exclude during construction.
     @return: A string containing the request parameters of the search or sort query.
     """
+
     if excluded is None:
         excluded = []
 
-    request = "?"
-    for key, value in querydict.items():
-        if key not in excluded:
-            request += f"{key}={value}&"
+    params = {key: value for key, value in querydict.items() if key not in excluded}
+
+    request = f"?{urllib.parse.urlencode(params)}"
 
     return request
 
