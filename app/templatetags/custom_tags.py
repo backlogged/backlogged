@@ -17,7 +17,7 @@ def get_github_repo():
     Returns the URL to Backlogged's GitHub Repository.
     @return: The URL to Backlogged's GitHub Repository.
     """
-    return "https://github.com/backlogged/backlogged-new"
+    return "https://github.com/backlogged/backlogged"
 
 
 @register.simple_tag(name="github_release")
