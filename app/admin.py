@@ -17,7 +17,7 @@ class BackloggedGamesAdmin(admin.ModelAdmin):
     get_user.admin_order_field = "user__username"
 
 
-admin.site.register(BackloggedGame, BackloggedGamesAdmin)
+admin.site.register(BackloggedGamesModel, BackloggedGamesAdmin)
 
 
 class UserTimezoneAdmin(admin.ModelAdmin):
@@ -30,4 +30,4 @@ class UserTimezoneAdmin(admin.ModelAdmin):
     get_user.admin_order_field = "user__username"
 
 
-admin.site.register(UserTimezone, UserTimezoneAdmin)
+admin.site.register(UserTimezoneModel, UserTimezoneAdmin)
