@@ -8,7 +8,7 @@ from django.db import models
 from backlogger.storage import OverwriteStorage
 
 
-class BackloggedGamesModel(models.Model):
+class BackloggedGame(models.Model):
     """
     Model for all games in user backlogs.
     """
@@ -36,14 +36,14 @@ class CustomGame(models.Model):
     """
     Model for custom games.
     """
-    backlogged = models.OneToOneField(BackloggedGamesModel, primary_key=True, on_delete=models.CASCADE)
+    backlogged = models.OneToOneField(BackloggedGame, primary_key=True, on_delete=models.CASCADE)
     involved_companies = models.CharField(max_length=1024, default=None)
     summary = models.CharField(max_length=1024, default=None)
     cover_img = models.ImageField(storage=OverwriteStorage())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class UserTimezoneModel(models.Model):
+class UserTimezone(models.Model):
     """
     Model for user time zones.
     """

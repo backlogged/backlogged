@@ -66,9 +66,9 @@ def get_search_view_dicts(search: str, user_id: str, offset: int = 0):
             }
 
             try:
-                backlog = models.BackloggedGamesModel.objects
+                backlog = models.BackloggedGame.objects
                 backlogged = backlog.get(game_id=game.id, user_id=user_id)
-            except models.BackloggedGamesModel.DoesNotExist:
+            except models.BackloggedGame.DoesNotExist:
                 pass
             else:
                 game_dict["status_id"] = backlogged.status_id
@@ -92,8 +92,8 @@ def get_game_info_dict(game_id: int, mode: str, user_id: int):
     game_dict = {}
 
     try:
-        backlogged = models.BackloggedGamesModel.objects.get(game_id=game_id, user_id=user_id)
-    except models.BackloggedGamesModel.DoesNotExist:
+        backlogged = models.BackloggedGame.objects.get(game_id=game_id, user_id=user_id)
+    except models.BackloggedGame.DoesNotExist:
         pass
     else:
         game_dict["status_id"] = backlogged.status_id
@@ -359,7 +359,7 @@ def get_local_date(request: HttpRequest, use_api: bool):
     IP address to http://ipwhois.app. If False, this function will retrieve the user's timezone from UserTimezoneModel.
     @return: A date object representing the user's local date.
     """
-    timezones = models.UserTimezoneModel.objects
+    timezones = models.UserTimezone.objects
 
     def get_ip_address():
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")

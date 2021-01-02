@@ -18,9 +18,9 @@ import app.helpers as helpers
 import app.models as models
 from app.forms import *
 
-backlog = models.BackloggedGamesModel.objects
+backlog = models.BackloggedGame.objects
 custom = models.CustomGame.objects
-timezones = models.UserTimezoneModel.objects
+timezones = models.UserTimezone.objects
 
 
 class HomePageView(TemplateView):
@@ -118,7 +118,7 @@ class BacklogView(LoginRequiredMixin, ListView):
 
         try:
             timezones.get(user_id=user_id)
-        except models.UserTimezoneModel.DoesNotExist:
+        except models.UserTimezone.DoesNotExist:
             current_date = helpers.get_local_date(self.request, use_api=True)
         else:
             current_date = helpers.get_local_date(self.request, use_api=False)
@@ -385,7 +385,7 @@ class GameInfoView(LoginRequiredMixin, FormView):
 
         try:
             backlogged = backlog.get(game_id=game_dict["id"], user_id=self.request.user.id)
-        except models.BackloggedGamesModel.DoesNotExist:
+        except models.BackloggedGame.DoesNotExist:
             pass
         else:
             recorded_status, recorded_platform_name = backlogged.status_name, backlogged.platform_name
