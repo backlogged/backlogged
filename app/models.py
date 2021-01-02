@@ -4,6 +4,7 @@ Database models.
 
 from django.contrib.auth.models import User
 from django.db import models
+from django_cleanup import cleanup
 
 from backlogger.storage import OverwriteStorage
 
@@ -32,6 +33,7 @@ class BackloggedGame(models.Model):
             return None
 
 
+@cleanup.ignore  # TODO remove django_cleanup
 class CustomGame(models.Model):
     """
     Model for custom games.

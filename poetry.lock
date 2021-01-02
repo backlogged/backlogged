@@ -37,6 +37,19 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "cloudinary"
+version = "1.24.0"
+description = "Python and Django SDK for Cloudinary"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+certifi = "*"
+six = "*"
+urllib3 = "*"
+
+[[package]]
 name = "deprecated"
 version = "1.2.10"
 description = "Python @deprecated decorator to deprecate old python classes, functions or methods."
@@ -310,7 +323,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.9.0"
-content-hash = "d5a24c0eb117403cb8aba58b27baac331244b9cfb2082b592c3722dc013908f9"
+content-hash = "b72ca14146270116cca2d520f09d037112b442fa583b3c57e0280c1d00031ebd"
 
 [metadata.files]
 arrow = [
@@ -328,6 +341,9 @@ certifi = [
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
+]
+cloudinary = [
+    {file = "cloudinary-1.24.0.tar.gz", hash = "sha256:79a903b59a95e66076adffa4e848aa41e2d41f33edad2b2233b158597cc8f372"},
 ]
 deprecated = [
     {file = "Deprecated-1.2.10-py2.py3-none-any.whl", hash = "sha256:a766c1dccb30c5f6eb2b203f87edd1d8588847709c78589e1521d769addc8218"},
