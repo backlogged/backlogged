@@ -38,7 +38,7 @@ class CustomGame(models.Model):
     """
     backlogged = models.OneToOneField(BackloggedGame, primary_key=True, on_delete=models.CASCADE)
     involved_companies = models.CharField(max_length=1024, default=None)
-    summary = models.CharField(max_length=1024, default=None)
+    summary = models.CharField(max_length=3000, default=None)
     cover_img = models.ImageField(storage=OverwriteStorage())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
