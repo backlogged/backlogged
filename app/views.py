@@ -4,14 +4,14 @@ Views.
 
 import json
 import os
-import urllib.parse
+import uuid
 
 import arrow
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView, PasswordChangeView
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import redirect, render
 from django.views.generic import CreateView, UpdateView, FormView, TemplateView, ListView
 
 import app.helpers as helpers
@@ -27,6 +27,7 @@ class HomePageView(TemplateView):
     """
     The home page.
     """
+
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect("backlog")
@@ -191,6 +192,7 @@ class AddGameSearchView(LoginRequiredMixin, TemplateView):
     """
     Displays search results to users searching for games to add.
     """
+
     def get(self, request, *args, **kwargs):
         search_form = GameSearchForm(self.request.GET)
         user_id = self.request.user.id
@@ -250,8 +252,8 @@ class AddCustomGameView(LoginRequiredMixin, FormView):
         form_data = form.cleaned_data
         game_dict = helpers.create_custom_game_dict(form_data)
         self.request.session["custom_game"] = game_dict
-        redirect_url = f"{reverse('custom-game-preview')}?{urllib.parse.urlencode(game_dict)}"
-        return redirect(redirect_url)
+
+        return redirect("custom-game-preview")
 
 
 class CustomGamePreviewView(LoginRequiredMixin, FormView):
@@ -263,13 +265,14 @@ class CustomGamePreviewView(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["custom_game"] = self.request.session.pop("custom_game")
+        context["custom_game"] = self.request.session.get("custom_game")
 
         return context
 
     def form_valid(self, form):
         user = self.request.user
-        game_dict = self.request.GET
+        game_dict = self.request.session.pop("custom_game")
+        game_dict["game_id"] = f"custom-{uuid.uuid4()}"
         cover_img = helpers.create_custom_cover_file(game_dict["cover_img"],
                                                      f"{user.username}-{user.id}-{game_dict['game_id']}")
 
@@ -526,6 +529,7 @@ class AdminRedirectView(LoginRequiredMixin, TemplateView):
     """
     Redirects staff users to the administration page and non-staff users to an error page.
     """
+
     def get(self, request, *args, **kwargs):
         if self.request.user.is_staff:
             return redirect(f"/{os.getenv('ADMIN_URL')}")

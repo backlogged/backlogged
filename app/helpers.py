@@ -8,7 +8,6 @@ import os
 import re
 import string
 import urllib.parse
-import uuid
 
 import arrow
 import requests
@@ -278,7 +277,6 @@ def create_custom_game_dict(cg_data: dict):
     game_dict = {}
 
     game_dict.update({
-        "game_id": f"custom-{uuid.uuid4()}",
         "name": cg_data["game_name"],
         "status_id": 1 if not cg_data["now_playing"] else 2,
         "status_name": "backlog" if not cg_data["now_playing"] else "Now Playing",
