@@ -11,7 +11,7 @@
          style="display: flex;flex-direction:column;justify-content: center;align-items: center;height: 80vh;color: white">
         <div class="row">
             <div class="col-auto">
-                <img src="{% if not game.is_custom %} {{ game.cover_url }} {% else %} {% static game.cover_url %} {% endif %}"
+                <img src="{{ game.cover_url }}"
                      alt="" class="rounded mr-auto">
             </div>
             <div class="col-auto">

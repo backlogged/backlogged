@@ -18,9 +18,9 @@ psycopg2 = "^2.8.6"
 arrow = "^0.17.0"
 Pillow = "^8.0.1"
 django-npm = "^1.0.0"
-django-cleanup = "^5.1.0"
 markdown2 = "^2.3.10"
 cloudinary = "^1.24.0"
+django-cloudinary-storage = "^0.3.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -115,7 +115,7 @@
                                     data-placement="top"
                                     data-toggle="tooltip"
                                     height="200"
-                                    src="{% if not game.is_custom %} {{ game.cover_url }} {% else %} {% static game.cover_url %} {% endif %}"
+                                    src="{{ game.cover_url }}"
                                     style="margin-bottom: 10px;border-width: 3px !important;"
                                     title="{{ game.game_name }}"
                                     width="150">
@@ -146,7 +146,7 @@
                                         data-placement="top"
                                         data-toggle="tooltip"
                                         height="200"
-                                        src="{% if not game.is_custom %} {{ game.cover_url }} {% else %} {% static game.cover_url %} {% endif %}"
+                                        src="{{ game.cover_url }}"
                                         style="margin-bottom: 10px;border-width: 3px !important;"
                                         title="{{ game.game_name }}"
                                         width="150">

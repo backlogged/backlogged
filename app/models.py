@@ -4,9 +4,6 @@ Database models.
 
 from django.contrib.auth.models import User
 from django.db import models
-from django_cleanup import cleanup
-
-from backlogger.storage import OverwriteStorage
 
 
 class BackloggedGame(models.Model):
@@ -33,7 +30,6 @@ class BackloggedGame(models.Model):
             return None
 
 
-@cleanup.ignore  # TODO remove django_cleanup
 class CustomGame(models.Model):
     """
     Model for custom games.
@@ -41,7 +37,7 @@ class CustomGame(models.Model):
     backlogged = models.OneToOneField(BackloggedGame, primary_key=True, on_delete=models.CASCADE)
     involved_companies = models.CharField(max_length=1024, default=None)
     summary = models.CharField(max_length=3000, default=None)
-    cover_img = models.ImageField(storage=OverwriteStorage())
+    cover_img = models.ImageField(upload_to="Backlogged Custom Games/")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 

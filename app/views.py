@@ -281,7 +281,7 @@ class CustomGamePreviewView(LoginRequiredMixin, FormView):
                                     platform_id=game_dict["recorded_platform_id"],
                                     platform_name=game_dict["recorded_platform_name"],
                                     status_id=game_dict["status_id"], status_name=game_dict["status_name"],
-                                    cover_url=cover_img.name,
+                                    cover_url=cover_img,
                                     date_added=arrow.now().date(),
                                     is_custom=True)
 
@@ -290,6 +290,9 @@ class CustomGamePreviewView(LoginRequiredMixin, FormView):
                       cover_img=cover_img,
                       involved_companies=game_dict["involved_companies"],
                       summary=game_dict["full_summary"])
+
+        backlogged.cover_url = backlogged.custom_data.cover_img.url
+        backlogged.save()
 
         return redirect("backlog")
 
@@ -338,8 +341,10 @@ class EditCustomGameView(LoginRequiredMixin, FormView):
             cover_img = form_data["cover_img"]
             cover_img.name = f"{self.request.user.username}-{self.request.user.id}-{game_id}"
 
-            backlogged.cover_url = cover_img.name
             custom_game.cover_img = cover_img
+            custom_game.save()
+
+            backlogged.cover_url = backlogged.custom_data.cover_img.url
 
         backlogged.save()
         custom_game.save()
